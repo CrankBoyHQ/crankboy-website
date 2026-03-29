@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      CrankBoy - A high performance Game Boy® emulator for the Playdate™
+    </title>
+    <link rel="icon" type="image/x-icon" href="/favicon.png" />
+    <style>
+      @font-face {
+        font-family: "Press Start 2P";
+        src: url("PressStart2P.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background-color: #8a9a6a;
+        background-image:
+          linear-gradient(135deg, #8a9a6a 0%, #9aaa7a 50%, #8a9a6a 100%),
+          linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.1) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(0, 0, 0, 0.1) 75%
+          ),
+          linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.1) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(0, 0, 0, 0.1) 75%
+          );
+        background-size:
+          100% 100%,
+          4px 4px,
+          4px 4px;
+        background-blend-mode: overlay;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        line-height: 1.6;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 800px;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .links a {
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: bold;
+        font-family: "Press Start 2P", "Courier New", monospace;
+        padding: 8px 8px 5px 10px;
+        border-radius: 16px;
+        transition:
+          background-color 0.2s,
+          color 0.2s;
+      }
+
+      .links a:hover {
+        background-color: #d1cfba;
+        color: #333;
+      }
+
+      .disclaimer {
+        color: #555;
+        font-size: 0.875rem;
+        font-weight: bold;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .legal-details {
+        margin-top: 10px;
+      }
+
+      .legal-toggle {
+        color: #555;
+        font-size: 0.75rem;
+        font-weight: bold;
+        font-family: "Press Start 2P", "Courier New", monospace;
+        text-decoration: underline;
+        cursor: pointer;
+        list-style: none;
+        text-transform: uppercase;
+      }
+
+      .legal-toggle::-webkit-details-marker {
+        display: none;
+      }
+
+      .legal-content {
+        margin-top: 10px;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .legal-content p {
+        margin-bottom: 10px;
+      }
+
+      .playdate-container {
+        position: relative;
+        display: inline-block;
+        max-width: 544px;
+        width: 100%;
+        margin-bottom: 30px;
+      }
+
+      .tagline {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: 0.9rem;
+        color: #333;
+        text-align: center;
+        margin-bottom: 35px;
+        line-height: 1.4;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .playdate-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+      }
+
+      .logo-overlay {
+        position: absolute;
+        top: 24.5%;
+        left: 43.7%;
+        transform: translate(-50%, -50%);
+        max-width: 40%;
+        max-height: 40%;
+        width: auto;
+        height: auto;
+        pointer-events: none;
+      }
+
+      .download-btn-overlay {
+        position: absolute;
+        top: 45.3%;
+        left: 43.7%;
+        transform: translate(-50%, -50%);
+        background-color: #000;
+        color: #d1cfba;
+        padding: 8px 7px 6px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        border-radius: 12px;
+        font-family: "Press Start 2P", "Courier New", monospace;
+        image-rendering: pixelated;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .download-btn-overlay:hover,
+      .download-btn-overlay:active {
+        background-color: #8a9a6a;
+        color: #000;
+      }
+
+      @media (max-width: 600px) {
+        .links {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tagline">
+      A high performance Game Boy® emulator for the Playdate™
+    </div>
+    <div class="container">
+      <div class="playdate-container">
+        <picture>
+          <source srcset="playdate.webp" type="image/webp" />
+          <source srcset="playdate.png" type="image/png" />
+          <img
+            src="playdate.png"
+            alt="Playdate console with CrankBoy"
+            class="playdate-image"
+          />
+        </picture>
+        <picture>
+          <source srcset="logo.webp" type="image/webp" />
+          <source srcset="logo.png" type="image/png" />
+          <img src="logo.png" alt="CrankBoy Logo" class="logo-overlay" />
+        </picture>
+
+        <a
+          href="https://github.com/CrankBoyHQ/crankboy-app/releases"
+          class="download-btn-overlay"
+          >Get it on GitHub</a
+        >
+      </div>
+      <div class="links">
+        <a href="https://play.date/account/sideload/">Sideload</a>
+        <a href="https://github.com/CrankBoyHQ/crankboy-app">GitHub</a>
+        <a href="https://github.com/CrankBoyHQ/crankboy-app/releases"
+          >Releases</a
+        >
+        <a href="https://github.com/deltabeard/Peanut-GB">PeanutGB</a>
+        <a href="https://play.date">Playdate</a>
+      </div>
+
+      <div class="disclaimer">
+        <details class="legal-details">
+          <summary class="legal-toggle">Legal Notice</summary>
+          <div class="legal-content">
+            <p>
+              CrankBoy is an independent, community-led project and is not
+              affiliated with, authorized, sponsored, or endorsed by Nintendo
+              Co., Ltd. or Panic Inc.
+            </p>
+            <p>
+              Game Boy® is a registered trademark of Nintendo Co., Ltd.<br />
+              Playdate™ is a trademark of Panic Inc.<br />
+            </p>
+            <p>
+              This software is an emulator designed for the playback of legally
+              acquired ROM files and homebrew software. The developers of
+              CrankBoy do not provide, host, or distribute copyrighted ROM
+              files. All other trademarks are the property of their respective
+              owners.
+            </p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </body>
+</html>
