@@ -232,11 +232,82 @@
         z-index: 10;
       }
 
-      .playdate-container:has(.button-a:active) .download-btn-overlay,
-      .playdate-container:has(.download-btn-overlay:hover)
-        .download-btn-overlay {
-        background-color: #8a9a6a;
+      .download-btn-overlay:hover {
+        background-color: transparent;
         color: #000;
+        border: 2px solid #000;
+      }
+
+      .download-btn-overlay:has(.btn-text[style*="none"]) {
+        background-color: transparent;
+        color: #000;
+      }
+
+      .download-btn-overlay:has(.btn-text[style*="none"]):hover {
+        background-color: transparent;
+        color: #000;
+      }
+
+      .btn-loading {
+        display: none;
+      }
+
+      .btn-loading .dot {
+        opacity: 0;
+      }
+
+      .btn-loading .dot:nth-child(1) {
+        animation: dot1 2s infinite;
+        opacity: 1;
+      }
+
+      .btn-loading .dot:nth-child(2) {
+        animation: dot2 2s infinite;
+      }
+
+      .btn-loading .dot:nth-child(3) {
+        animation: dot3 2s infinite;
+      }
+
+      @keyframes dot1 {
+        0%,
+        75% {
+          opacity: 1;
+        }
+        76%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes dot2 {
+        0%,
+        25% {
+          opacity: 0;
+        }
+        26%,
+        75% {
+          opacity: 1;
+        }
+        76%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes dot3 {
+        0%,
+        50% {
+          opacity: 0;
+        }
+        51%,
+        75% {
+          opacity: 1;
+        }
+        76%,
+        100% {
+          opacity: 0;
+        }
       }
 
       @media (max-width: 600px) {
@@ -282,7 +353,11 @@
         <a
           href="https://github.com/CrankBoyHQ/crankboy-app/releases"
           class="download-btn-overlay"
-          >Get it on GitHub</a
+          ><span class="btn-text">Get it on GitHub</span
+          ><span class="btn-loading"
+            >Loading<span class="dot">.</span><span class="dot">.</span
+            ><span class="dot">.</span></span
+          ></a
         >
         <a
           href="https://github.com/CrankBoyHQ/crankboy-app/releases"
@@ -321,5 +396,25 @@
         </details>
       </div>
     </div>
+    <script>
+      document
+        .querySelectorAll(".download-btn-overlay, .button-a")
+        .forEach((btn) => {
+          btn.addEventListener("click", function (e) {
+            const downloadBtn = document.querySelector(".download-btn-overlay");
+            downloadBtn.querySelector(".btn-text").style.display = "none";
+            downloadBtn.querySelector(".btn-loading").style.display = "inline";
+          });
+        });
+
+      // Reset button text when returning via back button
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+          const downloadBtn = document.querySelector(".download-btn-overlay");
+          downloadBtn.querySelector(".btn-text").style.display = "inline";
+          downloadBtn.querySelector(".btn-loading").style.display = "none";
+        }
+      });
+    </script>
   </body>
 </html>
