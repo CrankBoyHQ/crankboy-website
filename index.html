@@ -232,6 +232,13 @@
         z-index: 10;
       }
 
+      .playdate-container:has(.button-a:active) .download-btn-overlay,
+      .playdate-container:has(.download-btn-overlay:hover)
+        .download-btn-overlay {
+        background-color: #8a9a6a;
+        color: #000;
+      }
+
       @media (max-width: 600px) {
         .links {
           flex-direction: column;
