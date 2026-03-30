@@ -8,6 +8,14 @@
       CrankBoy - A high performance Game Boy® emulator for the Playdate™
     </title>
     <link rel="icon" type="image/x-icon" href="/favicon.png" />
+    <link rel="preload" href="playdate.webp" as="image" />
+    <link
+      rel="preload"
+      href="PressStart2P.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <style>
       @font-face {
         font-family: "Press Start 2P";
@@ -354,12 +362,18 @@
             src="playdate.png"
             alt="Playdate console with CrankBoy"
             class="playdate-image"
+            decoding="async"
           />
         </picture>
         <picture>
           <source srcset="logo.webp" type="image/webp" />
           <source srcset="logo.png" type="image/png" />
-          <img src="logo.png" alt="CrankBoy Logo" class="logo-overlay" />
+          <img
+            src="logo.png"
+            alt="CrankBoy Logo"
+            class="logo-overlay"
+            decoding="async"
+          />
         </picture>
 
         <a
