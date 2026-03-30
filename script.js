@@ -1,12 +1,10 @@
-document
-  .querySelectorAll(".download-btn-overlay, .button-a")
-  .forEach((btn) => {
-    btn.addEventListener("click", function (e) {
-      const downloadBtn = document.querySelector(".download-btn-overlay");
-      downloadBtn.querySelector(".btn-text").style.display = "none";
-      downloadBtn.querySelector(".btn-loading").style.display = "inline";
-    });
+document.querySelectorAll(".download-btn-overlay, .button-a").forEach((btn) => {
+  btn.addEventListener("click", function (e) {
+    const downloadBtn = document.querySelector(".download-btn-overlay");
+    downloadBtn.querySelector(".btn-text").style.display = "none";
+    downloadBtn.querySelector(".btn-loading").style.display = "inline";
   });
+});
 
 // Reset button text when returning via back button or switching apps
 function resetButton() {

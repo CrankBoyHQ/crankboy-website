@@ -74,6 +74,15 @@ body {
   line-height: 1.6;
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: inherit;
+}
+
 .container {
   text-align: center;
   max-width: 800px;
@@ -96,16 +105,16 @@ body {
   padding: 8px 8px 5px 10px;
   border-radius: 16px;
   border: 2px solid transparent;
-  transition:
-    background-color 0.2s,
-    color 0.2s,
-    border-color 0.2s;
 }
 
 .links a:hover {
   background-color: #d1cfba;
   color: #333;
   border-color: #000;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s;
 }
 
 .disclaimer {
@@ -168,6 +177,7 @@ body {
 .playdate-image {
   width: 100%;
   height: auto;
+  aspect-ratio: 513 / 509;
   display: block;
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
 }
@@ -179,6 +189,7 @@ body {
   transform: translate(-50%, -50%);
   width: 37%;
   height: auto;
+  aspect-ratio: 180 / 150;
   pointer-events: none;
 }
 
