@@ -70,3 +70,4 @@ playground.xcworkspace
 *.xcuserstate
 *.xcscmblueprint
 index.min.html
+*.gz
