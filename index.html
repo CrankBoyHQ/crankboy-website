@@ -117,10 +117,10 @@
 
       .logo-overlay {
         position: absolute;
-        top: 24.5%;
+        top: 25.7%;
         left: 43.7%;
         transform: translate(-50%, -50%);
-        width: 37%;
+        width: 35%;
         height: auto;
         aspect-ratio: 180 / 150;
         pointer-events: none;
@@ -197,6 +197,43 @@
         border: 2px solid transparent;
       }
 
+      .button-power {
+        position: absolute;
+        top: 1%;
+        left: 78.1%;
+        transform: translate(-50%, -50%);
+        width: 11%;
+        aspect-ratio: 7 / 1;
+        background-color: transparent;
+        border-top-left-radius: 35%;
+        border-top-right-radius: 35%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-power:active {
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+        transform: translate(-50%, -48%);
+      }
+
+      .button-menu {
+        position: absolute;
+        top: 12.75%;
+        left: 89.45%;
+        transform: translate(-50%, -50%);
+        width: 5%;
+        aspect-ratio: 1 / 1;
+        background-color: transparent;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-menu:active {
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+        transform: translate(-50%, -48%);
+      }
+
       .button-a {
         position: absolute;
         top: 70.8%;
@@ -213,6 +250,143 @@
       .button-a:active {
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
         transform: translate(-50%, -48%);
+      }
+
+      .button-b {
+        position: absolute;
+        top: 70.8%;
+        left: 57.5%;
+        transform: translate(-50%, -50%);
+        width: 10.5%;
+        aspect-ratio: 1 / 1;
+        background-color: transparent;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-b:active {
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+        transform: translate(-50%, -48%);
+      }
+
+      .button-up {
+        position: absolute;
+        top: 68.7%;
+        left: 20%;
+        transform: translate(-50%, -50%);
+        width: 5.4%;
+        height: 7.8%;
+        background-color: transparent;
+        border-top-left-radius: 40%;
+        border-top-right-radius: 40%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-up:active {
+        box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.35);
+        transform: translate(-50%, -48%);
+      }
+
+      .button-down {
+        position: absolute;
+        top: 82%;
+        left: 20%;
+        transform: translate(-50%, -50%);
+        width: 5.4%;
+        height: 7.8%;
+        background-color: transparent;
+        border-bottom-left-radius: 40%;
+        border-bottom-right-radius: 40%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-down:active {
+        box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.35);
+        transform: translate(-50%, -48%);
+      }
+
+      .button-left {
+        position: absolute;
+        top: 75.4%;
+        left: 13.45%;
+        transform: translate(-50%, -50%);
+        height: 5.4%;
+        width: 7.8%;
+        background-color: transparent;
+        border-top-left-radius: 40%;
+        border-bottom-left-radius: 40%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-left:active {
+        box-shadow: inset 4px 0 6px rgba(0, 0, 0, 0.35);
+        transform: translate(-50%, -48%);
+      }
+
+      .button-right {
+        position: absolute;
+        top: 75.4%;
+        left: 26.7%;
+        transform: translate(-50%, -50%);
+        height: 5.4%;
+        width: 7.8%;
+        background-color: transparent;
+        border-top-right-radius: 40%;
+        border-bottom-right-radius: 40%;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .button-right:active {
+        box-shadow: inset -4px 0 6px rgba(0, 0, 0, 0.35);
+        transform: translate(-50%, -48%);
+      }
+
+      .display-container {
+        position: absolute;
+        top: 5.85%;
+        left: 4.7%;
+        width: 78%;
+        aspect-ratio: 5 / 3;
+        z-index: 20;
+        display: none;
+        background-color: #b1b1b1; /* Closer to Playdate's actual screen/image background */
+      }
+
+      .display-container.active {
+        display: block;
+      }
+
+      .display-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .display-content img {
+        position: absolute;
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        image-rendering: pixelated;
+        opacity: 1;
+        z-index: 1; /* New images start behind */
+      }
+
+      .display-content img.fade-out {
+        opacity: 0;
+        z-index: 2; /* Fading images stay on top */
+        transition: opacity 0.3s ease-in-out;
       }
 
       .disclaimer {
@@ -433,10 +607,45 @@
             ></a
           >
           <a
+            href="#"
+            class="button-power"
+            aria-label="Gallery"
+            id="power-button"
+          ></a>
+          <a
+            href="#"
+            class="button-menu"
+            aria-label="Gallery"
+            id="menu-button"
+          ></a>
+          <div class="display-container" id="display-container">
+            <div class="display-content"></div>
+          </div>
+          <a href="#" class="button-up" aria-label="Up" id="button-up"></a>
+          <a
+            href="#"
+            class="button-down"
+            aria-label="Down"
+            id="button-down"
+          ></a>
+          <a
+            href="#"
+            class="button-left"
+            aria-label="Left"
+            id="button-left"
+          ></a>
+          <a
+            href="#"
+            class="button-right"
+            aria-label="Right"
+            id="button-right"
+          ></a>
+          <a
             href="https://github.com/CrankBoyHQ/crankboy-app/releases"
             class="button-a"
             aria-label="Download"
           ></a>
+          <a href="#" class="button-b" aria-label="B"></a>
         </div>
         <div class="links">
           <a href="https://www.patreon.com/CrankBoy">Patreon</a>
@@ -472,11 +681,18 @@
       </div>
     </main>
     <script>
+      // Handle download button (A button)
       document
         .querySelectorAll(".download-btn-overlay, .button-a")
-        .forEach((btn) => {
+        .forEach(function (btn) {
           btn.addEventListener("click", function (e) {
-            const downloadBtn = document.querySelector(".download-btn-overlay");
+            // If display is active, do nothing
+            if (displayActive) {
+              e.preventDefault();
+              return;
+            }
+            // Otherwise show loading state
+            var downloadBtn = document.querySelector(".download-btn-overlay");
             downloadBtn.querySelector(".btn-text").style.display = "none";
             downloadBtn.querySelector(".btn-loading").style.display = "inline";
           });
@@ -498,6 +714,124 @@
         if (document.visibilityState === "visible") {
           resetButton();
         }
+      });
+
+      // Simple display functionality
+      const powerButton = document.getElementById("power-button");
+      const displayContainer = document.getElementById("display-container");
+      const displayContent = document.querySelector(".display-content");
+      const buttonUp = document.getElementById("button-up");
+      const buttonDown = document.getElementById("button-down");
+
+      const menuImages = [
+        "10_cv2_a",
+        "20_kd",
+        "30_la_a",
+        "40_mmv",
+        "50_m2_a",
+        "60_sf2",
+        "70_tp",
+      ];
+      let currentImageIndex = 0;
+      let displayActive = false;
+      let bootTimeout = null;
+      const imageCache = {};
+      let currentObjectURL = null;
+
+      function showImage(src) {
+        var oldImg = displayContent.querySelector("img:not(.fade-out)");
+        var img = document.createElement("img");
+
+        var oldURL = currentObjectURL;
+
+        if (imageCache[src]) {
+          currentObjectURL = URL.createObjectURL(imageCache[src]);
+          img.src = currentObjectURL;
+        } else {
+          var cacheBuster = "?t=" + Date.now();
+          img.src = src + cacheBuster;
+        }
+
+        img.onload = function () {
+          if (oldImg) {
+            // Old image fades out on top (z-index 2)
+            oldImg.classList.add("fade-out");
+            setTimeout(function () {
+              if (oldImg.parentNode === displayContent) {
+                displayContent.removeChild(oldImg);
+              }
+              // Only revoke if this was actually the URL for the old image
+              if (oldURL && oldURL !== currentObjectURL) {
+                URL.revokeObjectURL(oldURL);
+              }
+            }, 300);
+          }
+        };
+
+        // New image is already opacity 1 and z-index 1
+        displayContent.appendChild(img);
+      }
+
+      powerButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (displayActive) {
+          displayActive = false;
+          displayContainer.classList.remove("active");
+          clearTimeout(bootTimeout);
+          // Wait for transition if needed, or clear instantly
+          displayContent.innerHTML = "";
+          if (currentObjectURL) {
+            URL.revokeObjectURL(currentObjectURL);
+            currentObjectURL = null;
+          }
+        } else {
+          displayActive = true;
+          displayContainer.classList.add("active");
+          showImage("display/boot.webp");
+          bootTimeout = setTimeout(function () {
+            if (displayActive)
+              showImage("display/menu/" + menuImages[0] + ".webp");
+            bootTimeout = null;
+          }, 1600);
+        }
+      });
+
+      buttonUp.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!displayActive || bootTimeout) return;
+        currentImageIndex =
+          (currentImageIndex - 1 + menuImages.length) % menuImages.length;
+        showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+      });
+
+      buttonDown.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!displayActive || bootTimeout) return;
+        currentImageIndex = (currentImageIndex + 1) % menuImages.length;
+        showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+      });
+
+      // Preload images as Blobs to allow restarting animations locally
+      window.addEventListener("load", function () {
+        ["display/boot.webp"]
+          .concat(
+            menuImages.map(function (n) {
+              return "display/menu/" + n + ".webp";
+            }),
+          )
+          .forEach(function (src) {
+            fetch(src)
+              .then(function (res) {
+                return res.blob();
+              })
+              .then(function (blob) {
+                imageCache[src] = blob;
+              })
+              .catch(function () {
+                // Fallback to traditional preloading if fetch fails
+                new Image().src = src;
+              });
+          });
       });
     </script>
   </body>
