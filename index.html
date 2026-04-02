@@ -653,7 +653,10 @@
           <a href="https://github.com/CrankBoyHQ/crankboy-app/releases"
             >Releases</a
           >
-          <a href="https://github.com/deltabeard/Peanut-GB">PeanutGB</a>
+          <a
+            href="https://discord.com/channels/675983554655551509/1398373474711371967"
+            >Discord</a
+          >
           <a href="https://play.date">Playdate</a>
         </div>
 
@@ -810,7 +813,9 @@
           showImage("display/boot.webp");
           bootTimeout = setTimeout(function () {
             if (displayActive)
-              showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+              showImage(
+                "display/menu/" + menuImages[currentImageIndex] + ".webp",
+              );
             bootTimeout = null;
           }, 1600);
         }
@@ -849,7 +854,8 @@
       function prevGameImage() {
         const images = gameImages[menuImages[currentImageIndex]];
         if (!images || images.length === 0) return;
-        currentGameImageIndex = (currentGameImageIndex - 1 + images.length) % images.length;
+        currentGameImageIndex =
+          (currentGameImageIndex - 1 + images.length) % images.length;
         const folder = getSubfolder(menuImages[currentImageIndex]);
         showImage(`display/${folder}/${images[currentGameImageIndex]}.webp`);
       }
@@ -893,12 +899,12 @@
       // Preload images as Blobs to allow restarting animations locally
       window.addEventListener("load", function () {
         const allImages = ["display/boot.webp"];
-        menuImages.forEach(img => {
+        menuImages.forEach((img) => {
           allImages.push(`display/menu/${img}.webp`);
           const folder = getSubfolder(img);
           // Safety check: only loop if gameImages[img] is defined
           if (gameImages[img]) {
-            gameImages[img].forEach(gImg => {
+            gameImages[img].forEach((gImg) => {
               allImages.push(`display/${folder}/${gImg}.webp`);
             });
           }
