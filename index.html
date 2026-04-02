@@ -717,12 +717,6 @@
       });
 
       // Simple display functionality
-      const powerButton = document.getElementById("power-button");
-      const displayContainer = document.getElementById("display-container");
-      const displayContent = document.querySelector(".display-content");
-      const buttonUp = document.getElementById("button-up");
-      const buttonDown = document.getElementById("button-down");
-
       const menuImages = [
         "10_cv2_a",
         "20_kd",
@@ -732,11 +726,35 @@
         "60_sf2",
         "70_tp",
       ];
+      // Map menu items to their subfolder game images
+      const gameImages = {
+        "10_cv2_a": ["10_game_cv2_a", "20_game_cv2_a"],
+        "20_kd": [],
+        "30_la_a": [],
+        "40_mmv": [],
+        "50_m2_a": [],
+        "60_sf2": [],
+        "70_tp": [],
+      };
+
       let currentImageIndex = 0;
+      let currentGameImageIndex = 0;
       let displayActive = false;
+      let inGame = false;
       let bootTimeout = null;
       const imageCache = {};
       let currentObjectURL = null;
+
+      const powerButton = document.getElementById("power-button");
+      const menuButton = document.getElementById("menu-button");
+      const displayContainer = document.getElementById("display-container");
+      const displayContent = document.querySelector(".display-content");
+      const buttonUp = document.getElementById("button-up");
+      const buttonDown = document.getElementById("button-down");
+      const buttonLeft = document.getElementById("button-left");
+      const buttonRight = document.getElementById("button-right");
+      const buttonA = document.querySelector(".button-a");
+      const buttonB = document.querySelector(".button-b");
 
       function showImage(src) {
         var oldImg = displayContent.querySelector("img:not(.fade-out)");
@@ -754,13 +772,11 @@
 
         img.onload = function () {
           if (oldImg) {
-            // Old image fades out on top (z-index 2)
             oldImg.classList.add("fade-out");
             setTimeout(function () {
               if (oldImg.parentNode === displayContent) {
                 displayContent.removeChild(oldImg);
               }
-              // Only revoke if this was actually the URL for the old image
               if (oldURL && oldURL !== currentObjectURL) {
                 URL.revokeObjectURL(oldURL);
               }
@@ -768,17 +784,20 @@
           }
         };
 
-        // New image is already opacity 1 and z-index 1
         displayContent.appendChild(img);
+      }
+
+      function getSubfolder(menuImg) {
+        return menuImg.replace(/_a$/, "");
       }
 
       powerButton.addEventListener("click", function (e) {
         e.preventDefault();
         if (displayActive) {
           displayActive = false;
+          inGame = false;
           displayContainer.classList.remove("active");
           clearTimeout(bootTimeout);
-          // Wait for transition if needed, or clear instantly
           displayContent.innerHTML = "";
           if (currentObjectURL) {
             URL.revokeObjectURL(currentObjectURL);
@@ -786,19 +805,27 @@
           }
         } else {
           displayActive = true;
+          inGame = false;
           displayContainer.classList.add("active");
           showImage("display/boot.webp");
           bootTimeout = setTimeout(function () {
             if (displayActive)
-              showImage("display/menu/" + menuImages[0] + ".webp");
+              showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
             bootTimeout = null;
           }, 1600);
         }
       });
 
+      menuButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!displayActive || bootTimeout || !inGame) return;
+        inGame = false;
+        showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+      });
+
       buttonUp.addEventListener("click", function (e) {
         e.preventDefault();
-        if (!displayActive || bootTimeout) return;
+        if (!displayActive || bootTimeout || inGame) return;
         currentImageIndex =
           (currentImageIndex - 1 + menuImages.length) % menuImages.length;
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
@@ -806,32 +833,89 @@
 
       buttonDown.addEventListener("click", function (e) {
         e.preventDefault();
-        if (!displayActive || bootTimeout) return;
+        if (!displayActive || bootTimeout || inGame) return;
         currentImageIndex = (currentImageIndex + 1) % menuImages.length;
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
       });
 
+      function nextGameImage() {
+        const images = gameImages[menuImages[currentImageIndex]];
+        if (!images || images.length === 0) return;
+        currentGameImageIndex = (currentGameImageIndex + 1) % images.length;
+        const folder = getSubfolder(menuImages[currentImageIndex]);
+        showImage(`display/${folder}/${images[currentGameImageIndex]}.webp`);
+      }
+
+      function prevGameImage() {
+        const images = gameImages[menuImages[currentImageIndex]];
+        if (!images || images.length === 0) return;
+        currentGameImageIndex = (currentGameImageIndex - 1 + images.length) % images.length;
+        const folder = getSubfolder(menuImages[currentImageIndex]);
+        showImage(`display/${folder}/${images[currentGameImageIndex]}.webp`);
+      }
+
+      buttonA.addEventListener("click", function (e) {
+        if (!displayActive || bootTimeout) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!inGame) {
+          const images = gameImages[menuImages[currentImageIndex]];
+          if (images && images.length > 0) {
+            inGame = true;
+            currentGameImageIndex = 0;
+            const folder = getSubfolder(menuImages[currentImageIndex]);
+            showImage(`display/${folder}/${images[0]}.webp`);
+          }
+        } else {
+          nextGameImage();
+        }
+      });
+
+      buttonB.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!displayActive || bootTimeout || !inGame) return;
+        prevGameImage();
+      });
+
+      buttonRight.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!displayActive || bootTimeout || !inGame) return;
+        nextGameImage();
+      });
+
+      buttonLeft.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!displayActive || bootTimeout || !inGame) return;
+        prevGameImage();
+      });
+
       // Preload images as Blobs to allow restarting animations locally
       window.addEventListener("load", function () {
-        ["display/boot.webp"]
-          .concat(
-            menuImages.map(function (n) {
-              return "display/menu/" + n + ".webp";
-            }),
-          )
-          .forEach(function (src) {
-            fetch(src)
-              .then(function (res) {
-                return res.blob();
-              })
-              .then(function (blob) {
-                imageCache[src] = blob;
-              })
-              .catch(function () {
-                // Fallback to traditional preloading if fetch fails
-                new Image().src = src;
-              });
-          });
+        const allImages = ["display/boot.webp"];
+        menuImages.forEach(img => {
+          allImages.push(`display/menu/${img}.webp`);
+          const folder = getSubfolder(img);
+          // Safety check: only loop if gameImages[img] is defined
+          if (gameImages[img]) {
+            gameImages[img].forEach(gImg => {
+              allImages.push(`display/${folder}/${gImg}.webp`);
+            });
+          }
+        });
+
+        allImages.forEach(function (src) {
+          fetch(src)
+            .then(function (res) {
+              return res.blob();
+            })
+            .then(function (blob) {
+              imageCache[src] = blob;
+            })
+            .catch(function () {
+              new Image().src = src;
+            });
+        });
       });
     </script>
   </body>
