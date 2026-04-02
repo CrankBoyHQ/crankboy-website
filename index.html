@@ -580,6 +580,7 @@
               class="playdate-image"
               decoding="async"
               fetchpriority="high"
+              loading="eager"
               width="513"
               height="509"
             />
@@ -592,6 +593,8 @@
               alt="CrankBoy Logo"
               class="logo-overlay"
               decoding="async"
+              fetchpriority="low"
+              loading="lazy"
               width="180"
               height="150"
             />
@@ -822,6 +825,8 @@
           displayActive = true;
           inGame = false;
           displayContainer.classList.add("active");
+          // Start preloading display images only when user turns on display
+          preloadDisplayImages();
           showImage("display/boot.webp");
           bootTimeout = setTimeout(function () {
             if (displayActive)
@@ -846,6 +851,9 @@
         currentImageIndex =
           (currentImageIndex - 1 + menuImages.length) % menuImages.length;
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+        // Preload adjacent menu image
+        const nextIndex = (currentImageIndex - 1 + menuImages.length) % menuImages.length;
+        preloadImage("display/menu/" + menuImages[nextIndex] + ".webp");
       });
 
       buttonDown.addEventListener("click", function (e) {
@@ -853,6 +861,9 @@
         if (!displayActive || bootTimeout || inGame) return;
         currentImageIndex = (currentImageIndex + 1) % menuImages.length;
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+        // Preload adjacent menu image
+        const nextIndex = (currentImageIndex + 1) % menuImages.length;
+        preloadImage("display/menu/" + menuImages[nextIndex] + ".webp");
       });
 
       function nextGameImage() {
@@ -860,7 +871,12 @@
         if (!images || images.length === 0) return;
         currentGameImageIndex = (currentGameImageIndex + 1) % images.length;
         const folder = getSubfolder(menuImages[currentImageIndex]);
-        showImage(`display/${folder}/${images[currentGameImageIndex]}.webp`);
+        const currentSrc = `display/${folder}/${images[currentGameImageIndex]}.webp`;
+        showImage(currentSrc);
+        // Preload next image for smoother navigation
+        const nextIndex = (currentGameImageIndex + 1) % images.length;
+        const nextSrc = `display/${folder}/${images[nextIndex]}.webp`;
+        preloadImage(nextSrc);
       }
 
       function prevGameImage() {
@@ -869,7 +885,12 @@
         currentGameImageIndex =
           (currentGameImageIndex - 1 + images.length) % images.length;
         const folder = getSubfolder(menuImages[currentImageIndex]);
-        showImage(`display/${folder}/${images[currentGameImageIndex]}.webp`);
+        const currentSrc = `display/${folder}/${images[currentGameImageIndex]}.webp`;
+        showImage(currentSrc);
+        // Preload previous image for smoother navigation
+        const prevIndex = (currentGameImageIndex - 1 + images.length) % images.length;
+        const prevSrc = `display/${folder}/${images[prevIndex]}.webp`;
+        preloadImage(prevSrc);
       }
 
       buttonA.addEventListener("click", function (e) {
@@ -908,33 +929,29 @@
         prevGameImage();
       });
 
-      // Preload images as Blobs to allow restarting animations locally
-      window.addEventListener("load", function () {
-        const allImages = ["display/boot.webp"];
-        menuImages.forEach((img) => {
-          allImages.push(`display/menu/${img}.webp`);
-          const folder = getSubfolder(img);
-          // Safety check: only loop if gameImages[img] is defined
-          if (gameImages[img]) {
-            gameImages[img].forEach((gImg) => {
-              allImages.push(`display/${folder}/${gImg}.webp`);
-            });
-          }
-        });
+      // Lazy load images only when needed - not on initial page load
+      function preloadImage(src) {
+        if (imageCache[src]) return Promise.resolve();
+        return fetch(src)
+          .then(function (res) {
+            return res.blob();
+          })
+          .then(function (blob) {
+            imageCache[src] = blob;
+          })
+          .catch(function () {
+            // Silent fail - will load normally on display
+          });
+      }
 
-        allImages.forEach(function (src) {
-          fetch(src)
-            .then(function (res) {
-              return res.blob();
-            })
-            .then(function (blob) {
-              imageCache[src] = blob;
-            })
-            .catch(function () {
-              new Image().src = src;
-            });
-        });
-      });
+      // Preload boot and current menu image when display is turned on
+      function preloadDisplayImages() {
+        const imagesToPreload = ["display/boot.webp"];
+        const currentMenu = menuImages[currentImageIndex];
+        imagesToPreload.push(`display/menu/${currentMenu}.webp`);
+
+        imagesToPreload.forEach(preloadImage);
+      }
     </script>
   </body>
 </html>
