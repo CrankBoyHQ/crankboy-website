@@ -145,7 +145,8 @@ const videoContainer = document.getElementById("video-container");
 const easterEggVideo = document.getElementById("easter-egg-video");
 
 function showImage(src) {
-  var oldImg = displayContent.querySelector("img:not(.fade-out)");
+  // Find the currently visible image (the one that was most recently added)
+  var oldImg = displayContent.querySelector("img[data-current]");
   var img = document.createElement("img");
 
   var oldURL = currentObjectURL;
@@ -158,8 +159,13 @@ function showImage(src) {
     img.src = src + cacheBuster;
   }
 
+  // Mark this as the current image
+  img.setAttribute("data-current", "true");
+
   img.onload = function () {
     if (oldImg) {
+      // Remove current marker from old image and add fade-out
+      oldImg.removeAttribute("data-current");
       oldImg.classList.add("fade-out");
       setTimeout(function () {
         if (oldImg.parentNode === displayContent) {
