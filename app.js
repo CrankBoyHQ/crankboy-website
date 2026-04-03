@@ -3,8 +3,8 @@ document
   .querySelectorAll(".download-btn-overlay, .button-a")
   .forEach(function (btn) {
     btn.addEventListener("click", function (e) {
-      // If display is active, do nothing
-      if (displayActive) {
+      // If display is active or video is playing, do nothing
+      if (displayActive || videoPlaying) {
         e.preventDefault();
         return;
       }
@@ -122,10 +122,12 @@ function checkCombo(button) {
 function playEasterEggVideo() {
   videoPlaying = true;
   videoContainer.classList.add("active");
+  updateAButtonHref();
   easterEggVideo.currentTime = 0;
   easterEggVideo.play().catch(function () {
     videoContainer.classList.remove("active");
     videoPlaying = false;
+    updateAButtonHref();
   });
 }
 
@@ -177,6 +179,18 @@ function getSubfolder(menuImg) {
   return menuImg.replace(/_a$/, "");
 }
 
+const A_BUTTON_DEFAULT_HREF =
+  "https://github.com/CrankBoyHQ/crankboy-app/releases";
+
+function updateAButtonHref() {
+  // Show # link when in display mode or video is playing
+  if (displayActive || videoPlaying) {
+    buttonA.setAttribute("href", "#");
+  } else {
+    buttonA.setAttribute("href", A_BUTTON_DEFAULT_HREF);
+  }
+}
+
 powerButton.addEventListener("click", function (e) {
   e.preventDefault();
   // Stop any playing video and reset combo when power button is pressed
@@ -186,6 +200,7 @@ powerButton.addEventListener("click", function (e) {
     videoContainer.classList.remove("active");
     videoPlaying = false;
     resetCombo();
+    updateAButtonHref();
     return; // Return to main view, don't activate display mode
   }
   resetCombo();
@@ -212,6 +227,7 @@ powerButton.addEventListener("click", function (e) {
       bootTimeout = null;
     }, 1600);
   }
+  updateAButtonHref();
 });
 
 menuButton.addEventListener("click", function (e) {
@@ -338,4 +354,5 @@ function preloadDisplayImages() {
 easterEggVideo.addEventListener("ended", function () {
   videoContainer.classList.remove("active");
   videoPlaying = false;
+  updateAButtonHref();
 });
