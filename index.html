@@ -389,6 +389,28 @@
         transition: opacity 0.3s ease-in-out;
       }
 
+      .video-container {
+        position: absolute;
+        top: 5.85%;
+        left: 4.7%;
+        width: 78%;
+        aspect-ratio: 5 / 3;
+        z-index: 25;
+        display: none;
+        background-color: #000;
+        overflow: hidden;
+      }
+
+      .video-container.active {
+        display: block;
+      }
+
+      .video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
       .disclaimer {
         color: #555;
         font-size: 0.875rem;
@@ -624,6 +646,11 @@
           <div class="display-container" id="display-container">
             <div class="display-content"></div>
           </div>
+          <div class="video-container" id="video-container">
+            <video id="easter-egg-video" playsinline>
+              <source src="rubdubdub.mp4" type="video/mp4" />
+            </video>
+          </div>
           <a href="#" class="button-up" aria-label="Up" id="button-up"></a>
           <a
             href="#"
@@ -760,8 +787,68 @@
       let displayActive = false;
       let inGame = false;
       let bootTimeout = null;
+      let videoPlaying = false;
       const imageCache = {};
       let currentObjectURL = null;
+
+      // Easter egg combo: right, up, b, down, up, b, down, up, b
+      const rubdubdubCombo = [
+        "right",
+        "up",
+        "b",
+        "down",
+        "up",
+        "b",
+        "down",
+        "up",
+        "b",
+      ];
+      let currentCombo = [];
+      let comboTimeout = null;
+
+      function resetCombo() {
+        currentCombo = [];
+        if (comboTimeout) {
+          clearTimeout(comboTimeout);
+          comboTimeout = null;
+        }
+      }
+
+      function checkCombo(button) {
+        // Only track combo when in default view (not in display mode)
+        if (displayActive || videoPlaying) return;
+
+        currentCombo.push(button);
+
+        // Check if current combo matches so far
+        for (let i = 0; i < currentCombo.length; i++) {
+          if (currentCombo[i] !== rubdubdubCombo[i]) {
+            resetCombo();
+            return;
+          }
+        }
+
+        // Check if combo is complete
+        if (currentCombo.length === rubdubdubCombo.length) {
+          resetCombo();
+          playEasterEggVideo();
+          return;
+        }
+
+        // Set timeout to reset combo after 9 seconds
+        if (comboTimeout) clearTimeout(comboTimeout);
+        comboTimeout = setTimeout(resetCombo, 9000);
+      }
+
+      function playEasterEggVideo() {
+        videoPlaying = true;
+        videoContainer.classList.add("active");
+        easterEggVideo.currentTime = 0;
+        easterEggVideo.play().catch(function () {
+          videoContainer.classList.remove("active");
+          videoPlaying = false;
+        });
+      }
 
       const powerButton = document.getElementById("power-button");
       const menuButton = document.getElementById("menu-button");
@@ -773,6 +860,8 @@
       const buttonRight = document.getElementById("button-right");
       const buttonA = document.querySelector(".button-a");
       const buttonB = document.querySelector(".button-b");
+      const videoContainer = document.getElementById("video-container");
+      const easterEggVideo = document.getElementById("easter-egg-video");
 
       function showImage(src) {
         var oldImg = displayContent.querySelector("img:not(.fade-out)");
@@ -811,6 +900,16 @@
 
       powerButton.addEventListener("click", function (e) {
         e.preventDefault();
+        // Stop any playing video and reset combo when power button is pressed
+        if (videoPlaying) {
+          easterEggVideo.pause();
+          easterEggVideo.currentTime = 0;
+          videoContainer.classList.remove("active");
+          videoPlaying = false;
+          resetCombo();
+          return; // Return to main view, don't activate display mode
+        }
+        resetCombo();
         if (displayActive) {
           displayActive = false;
           inGame = false;
@@ -847,17 +946,20 @@
 
       buttonUp.addEventListener("click", function (e) {
         e.preventDefault();
+        checkCombo("up");
         if (!displayActive || bootTimeout || inGame) return;
         currentImageIndex =
           (currentImageIndex - 1 + menuImages.length) % menuImages.length;
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
         // Preload adjacent menu image
-        const nextIndex = (currentImageIndex - 1 + menuImages.length) % menuImages.length;
+        const nextIndex =
+          (currentImageIndex - 1 + menuImages.length) % menuImages.length;
         preloadImage("display/menu/" + menuImages[nextIndex] + ".webp");
       });
 
       buttonDown.addEventListener("click", function (e) {
         e.preventDefault();
+        checkCombo("down");
         if (!displayActive || bootTimeout || inGame) return;
         currentImageIndex = (currentImageIndex + 1) % menuImages.length;
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
@@ -888,7 +990,8 @@
         const currentSrc = `display/${folder}/${images[currentGameImageIndex]}.webp`;
         showImage(currentSrc);
         // Preload previous image for smoother navigation
-        const prevIndex = (currentGameImageIndex - 1 + images.length) % images.length;
+        const prevIndex =
+          (currentGameImageIndex - 1 + images.length) % images.length;
         const prevSrc = `display/${folder}/${images[prevIndex]}.webp`;
         preloadImage(prevSrc);
       }
@@ -913,12 +1016,14 @@
 
       buttonB.addEventListener("click", function (e) {
         e.preventDefault();
+        checkCombo("b");
         if (!displayActive || bootTimeout || !inGame) return;
         prevGameImage();
       });
 
       buttonRight.addEventListener("click", function (e) {
         e.preventDefault();
+        checkCombo("right");
         if (!displayActive || bootTimeout || !inGame) return;
         nextGameImage();
       });
@@ -952,6 +1057,12 @@
 
         imagesToPreload.forEach(preloadImage);
       }
+
+      // Hide video container when easter egg video ends
+      easterEggVideo.addEventListener("ended", function () {
+        videoContainer.classList.remove("active");
+        videoPlaying = false;
+      });
     </script>
   </body>
 </html>
