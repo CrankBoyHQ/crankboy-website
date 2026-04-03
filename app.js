@@ -231,6 +231,10 @@ powerButton.addEventListener("click", function (e) {
     videoPlaying = false;
     resetCombo();
     updateAButtonHref();
+    // Restart hint if display hasn't been activated yet
+    if (!displayEverActivated && !powerButtonHintInterval) {
+      startPowerButtonHint();
+    }
     return; // Return to main view, don't activate display mode
   }
   resetCombo();
