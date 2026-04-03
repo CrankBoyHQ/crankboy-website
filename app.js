@@ -84,6 +84,28 @@ const rubdubdubCombo = [
 ];
 let currentCombo = [];
 let comboTimeout = null;
+let displayEverActivated = false;
+let powerButtonHintInterval = null;
+
+function startPowerButtonHint() {
+  // Show hint every 2 seconds until display is activated
+  powerButtonHintInterval = setInterval(function () {
+    if (!displayEverActivated && !displayActive && !videoPlaying) {
+      ledIndicator.classList.add("active", "blinking");
+      setTimeout(function () {
+        ledIndicator.classList.remove("active", "blinking");
+      }, 1000);
+    }
+  }, 2000);
+}
+
+function stopPowerButtonHint() {
+  if (powerButtonHintInterval) {
+    clearInterval(powerButtonHintInterval);
+    powerButtonHintInterval = null;
+  }
+  ledIndicator.classList.remove("active", "blinking");
+}
 
 function resetCombo() {
   currentCombo = [];
@@ -122,6 +144,7 @@ function checkCombo(button) {
 function playEasterEggVideo() {
   videoPlaying = true;
   videoContainer.classList.add("active");
+  stopPowerButtonHint();
   updateAButtonHref();
   easterEggVideo.currentTime = 0;
   easterEggVideo.play().catch(function () {
@@ -141,6 +164,7 @@ const buttonLeft = document.getElementById("button-left");
 const buttonRight = document.getElementById("button-right");
 const buttonA = document.querySelector(".button-a");
 const buttonB = document.querySelector(".button-b");
+const ledIndicator = document.getElementById("led-indicator");
 const videoContainer = document.getElementById("video-container");
 const easterEggVideo = document.getElementById("easter-egg-video");
 
@@ -222,8 +246,10 @@ powerButton.addEventListener("click", function (e) {
     }
   } else {
     displayActive = true;
+    displayEverActivated = true;
     inGame = false;
     displayContainer.classList.add("active");
+    stopPowerButtonHint();
     // Start preloading display images only when user turns on display
     preloadDisplayImages();
     showImage("display/boot.webp");
@@ -361,4 +387,11 @@ easterEggVideo.addEventListener("ended", function () {
   videoContainer.classList.remove("active");
   videoPlaying = false;
   updateAButtonHref();
+  // Restart hint if display hasn't been activated yet
+  if (!displayEverActivated && !powerButtonHintInterval) {
+    startPowerButtonHint();
+  }
 });
+
+// Start power button hint animation
+startPowerButtonHint();

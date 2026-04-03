@@ -216,6 +216,45 @@
         transform: translate(-50%, -48%);
       }
 
+      .led-indicator {
+        position: absolute;
+        top: -0.4%;
+        left: 73.8%;
+        width: 1.5%;
+        aspect-ratio: 4 / 1;
+        background-color: transparent;
+        border-radius: 50% 50% 0 0;
+        z-index: 15;
+      }
+
+      .led-indicator.active {
+        background-color: #ff1493;
+        box-shadow:
+          0 0 4px #ff1493,
+          0 0 8px #ff1493,
+          0 0 12px #ff1493,
+          inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      }
+
+      @keyframes ledPulse {
+        0% {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+      }
+
+      .led-indicator.blinking {
+        animation: ledPulse 1.5s ease-in-out infinite;
+      }
+
       .button-menu {
         position: absolute;
         top: 12.75%;
@@ -631,6 +670,7 @@
               ><span class="dot">.</span></span
             ></a
           >
+          <div class="led-indicator" id="led-indicator"></div>
           <a
             href="#"
             class="button-power"
