@@ -57,7 +57,16 @@ const gameImages = {
   "30_la_a": [],
   "40_mmv": [],
   "50_m2_a": [],
-  "60_sf2": [],
+  "60_sf2": [
+    "10_game_sf2",
+    "20_game_sf2_a",
+    "30_game_sf2",
+    "40_game_sf2_a",
+    "50_game_sf2",
+    "60_game_sf2_a",
+    "70_game_sf2",
+    "80_game_sf2",
+  ],
   "70_tp": [],
 };
 
