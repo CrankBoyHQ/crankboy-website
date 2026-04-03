@@ -408,3 +408,44 @@ easterEggVideo.addEventListener("ended", function () {
 
 // Start power button hint animation
 startPowerButtonHint();
+
+// Defer load version JSON and display version number
+const versionDisplay = document.getElementById("version-display");
+
+function updateVersionDisplay() {
+  // Only show version on main view (not in display or video playback)
+  if (displayActive || videoPlaying) {
+    versionDisplay.classList.remove("visible");
+  } else {
+    versionDisplay.classList.add("visible");
+  }
+}
+
+// Fetch version JSON
+try {
+  fetch(
+    "https://raw.githubusercontent.com/CrankBoyHQ/crankboy-app/refs/heads/master/Source/version.json",
+  )
+    .then(function (res) {
+      if (!res.ok) throw new Error("Failed to load version");
+      return res.json();
+    })
+    .then(function (data) {
+      if (data.name) {
+        versionDisplay.textContent = data.name;
+        updateVersionDisplay();
+      }
+    })
+    .catch(function () {
+      // Silent fail - version won't be displayed
+    });
+} catch (e) {
+  // Silent fail
+}
+
+// Update version visibility when display or video state changes
+const originalUpdateAButtonHref = updateAButtonHref;
+updateAButtonHref = function () {
+  originalUpdateAButtonHref();
+  updateVersionDisplay();
+};
