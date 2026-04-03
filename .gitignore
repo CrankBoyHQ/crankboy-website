@@ -71,3 +71,4 @@ playground.xcworkspace
 *.xcscmblueprint
 index.min.html
 *.gz
+app.min.js
