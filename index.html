@@ -332,6 +332,13 @@
         line-height: 1;
       }
 
+      /* Hide Sync ROMs box on mobile/tablet devices */
+      @media (max-width: 768px), (pointer: coarse) {
+        .sync-roms-box {
+          display: none !important;
+        }
+      }
+
       .version-display {
         position: absolute;
         top: 6%;
