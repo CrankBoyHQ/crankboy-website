@@ -8,6 +8,11 @@ document
         e.preventDefault();
         return;
       }
+      // If Playdate is connected, do nothing (button disabled)
+      if (playdateConnected) {
+        e.preventDefault();
+        return;
+      }
       // Otherwise show loading state
       var downloadBtn = document.querySelector(".download-btn-overlay");
       downloadBtn.querySelector(".btn-text").style.display = "none";
@@ -76,8 +81,114 @@ let displayActive = false;
 let inGame = false;
 let bootTimeout = null;
 let videoPlaying = false;
+let awaitingFolderSelection = false;
+let playdateConnected = false;
+let connectionPollInterval = null;
+const CONNECTION_POLL_INTERVAL = 3000; // Check every 3 seconds
 const imageCache = {};
 let currentObjectURL = null;
+
+// Function to disconnect Playdate and reset UI
+function disconnectPlaydate() {
+  if (!playdateConnected) return;
+
+  playdateConnected = false;
+  awaitingFolderSelection = false;
+  transferContainer.classList.remove("active");
+
+  // Stop polling
+  if (connectionPollInterval) {
+    clearInterval(connectionPollInterval);
+    connectionPollInterval = null;
+  }
+
+  // Reset LED - remove all states
+  if (ledIndicator) {
+    ledIndicator.classList.remove(
+      "active",
+      "blinking",
+      "transferring",
+      "connected",
+    );
+  }
+
+  // Reset transfer views - show instruction, hide drop zone
+  const instructionView = document.getElementById("transfer-instruction-view");
+  const dropZone = document.getElementById("transfer-drop-zone");
+  if (instructionView && dropZone) {
+    instructionView.style.display = "flex";
+    dropZone.style.display = "none";
+  }
+
+  console.log("Playdate disconnected (device no longer detected)");
+
+  // Restart power button hint if display hasn't been activated
+  if (!displayEverActivated && !powerButtonHintInterval) {
+    startPowerButtonHint();
+  }
+}
+
+// LED control functions
+function setLEDTransferring(isTransferring) {
+  if (!ledIndicator) return;
+
+  if (isTransferring) {
+    ledIndicator.classList.add("transferring");
+    ledIndicator.classList.remove("active", "blinking", "connected");
+  } else {
+    ledIndicator.classList.remove("transferring");
+    // Return to solid blue when not transferring (but still connected)
+    if (playdateConnected) {
+      ledIndicator.classList.add("connected");
+    }
+  }
+}
+
+// Poll to check if Playdate is still connected
+function startConnectionPolling() {
+  // Clear any existing interval
+  if (connectionPollInterval) {
+    clearInterval(connectionPollInterval);
+  }
+
+  console.log("Starting connection polling...");
+
+  connectionPollInterval = setInterval(async function () {
+    if (!playdateConnected) {
+      clearInterval(connectionPollInterval);
+      connectionPollInterval = null;
+      return;
+    }
+
+    // Try to access the folder handle to detect disconnection
+    const folderHandle = window.PlaydateTransfer
+      ? window.PlaydateTransfer.getCurrentFolderHandle()
+      : null;
+    if (!folderHandle) {
+      console.log("No folder handle available, assuming disconnected");
+      disconnectPlaydate();
+      return;
+    }
+
+    try {
+      // Actually try to access the directory contents - this will fail if device disconnected
+      let entryCount = 0;
+      for await (const entry of folderHandle.values()) {
+        entryCount++;
+        break; // Just check if we can access at least one entry
+      }
+      // If we get here, device is still connected
+    } catch (error) {
+      // If we can't access the folder, device is likely disconnected
+      console.log(
+        "Cannot access Playdate folder, device likely disconnected:",
+        error.name,
+        error.message,
+      );
+      disconnectPlaydate();
+    }
+  }, CONNECTION_POLL_INTERVAL);
+}
 
 // Easter egg combo: right, up, b, down, up, b, down, up, b
 const rubdubdubCombo = [
@@ -95,6 +206,33 @@ let currentCombo = [];
 let comboTimeout = null;
 let displayEverActivated = false;
 let powerButtonHintInterval = null;
+
+// Check if browser supports file transfer features (Chromium-based)
+function isTransferSupported() {
+  return "serial" in navigator && "showDirectoryPicker" in window;
+}
+
+// Sync ROMs box functionality
+const syncRomsBox = document.getElementById("sync-roms-box");
+
+function showSyncRomsBox() {
+  if (syncRomsBox && isTransferSupported()) {
+    syncRomsBox.classList.add("visible");
+  }
+}
+
+function hideSyncRomsBox() {
+  if (syncRomsBox) {
+    syncRomsBox.classList.remove("visible");
+  }
+}
+
+// Show the box on page load if supported
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", showSyncRomsBox);
+} else {
+  showSyncRomsBox();
+}
 
 function startPowerButtonHint() {
   // Show hint every 2 seconds until display is activated
@@ -176,6 +314,8 @@ const buttonB = document.querySelector(".button-b");
 const ledIndicator = document.getElementById("led-indicator");
 const videoContainer = document.getElementById("video-container");
 const easterEggVideo = document.getElementById("easter-egg-video");
+const transferContainer = document.getElementById("transfer-container");
+const transferDropZone = document.getElementById("transfer-drop-zone");
 
 function showImage(src) {
   // Find the currently visible image (the one that was most recently added)
@@ -260,6 +400,7 @@ function togglePower() {
     displayActive = true;
     displayEverActivated = true;
     inGame = false;
+    awaitingFolderSelection = false;
     displayContainer.classList.add("active");
     stopPowerButtonHint();
     // Start preloading display images only when user turns on display
@@ -289,11 +430,87 @@ function togglePower() {
 
 powerButton.addEventListener("click", function (e) {
   e.preventDefault();
+
+  // If Playdate is connected, disconnect instead of toggling display
+  if (playdateConnected) {
+    disconnectPlaydate();
+    return;
+  }
+
   togglePower();
 });
 
 menuButton.addEventListener("click", function (e) {
   e.preventDefault();
+
+  // In main view (display off), handle Playdate connection flow
+  if (!displayActive && !videoPlaying) {
+    // If already connected but no folder selected, open folder picker
+    if (playdateConnected) {
+      if (window.PlaydateTransfer) {
+        // Force folder picker to show (don't use stored folder)
+        window.PlaydateTransfer.setupPlaydateFolder(true).then((handle) => {
+          if (handle) {
+            awaitingFolderSelection = false;
+            console.log("Playdate folder selected successfully");
+            // Turn on LED solid blue to show ready for transfer
+            if (ledIndicator) {
+              ledIndicator.classList.add("connected");
+              ledIndicator.classList.remove("blinking", "transferring");
+            }
+            // Hide instruction view and show drop zone
+            const instructionView = document.getElementById(
+              "transfer-instruction-view",
+            );
+            const dropZone = document.getElementById("transfer-drop-zone");
+            if (instructionView && dropZone) {
+              instructionView.style.display = "none";
+              dropZone.style.display = "flex";
+            }
+            // Start polling only after folder is selected
+            startConnectionPolling();
+          }
+        });
+      } else {
+        console.error("PlaydateTransfer module not loaded");
+      }
+      return;
+    }
+
+    // First press: trigger serial connection
+    if (window.PlaydateSerial) {
+      window.PlaydateSerial.enterDataDiskMode().then((success) => {
+        if (success) {
+          awaitingFolderSelection = true;
+          playdateConnected = true;
+          transferContainer.classList.add("active");
+          stopPowerButtonHint();
+          // Turn on LED blue to show connection established
+          if (ledIndicator) {
+            ledIndicator.classList.add("connected");
+          }
+          // Hide the sync ROMs box since user is now connected
+          hideSyncRomsBox();
+          // Show instruction view initially
+          const instructionView = document.getElementById(
+            "transfer-instruction-view",
+          );
+          if (instructionView) {
+            instructionView.style.display = "flex";
+          }
+          // Don't start polling yet - wait for folder selection
+        }
+      });
+    } else {
+      console.error("PlaydateSerial module not loaded");
+    }
+    return;
+  }
+
+  // Reset folder selection state and hide transfer container when entering display mode
+  disconnectPlaydate();
+
+  // In display mode, exit game back to menu
   if (!displayActive || bootTimeout || !inGame) return;
   inGame = false;
   showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
@@ -583,3 +800,117 @@ document.addEventListener("keydown", function (e) {
       break;
   }
 });
+
+// Transfer container drag and drop handlers
+if (transferDropZone) {
+  transferDropZone.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    transferDropZone.classList.add("drag-over");
+  });
+
+  transferDropZone.addEventListener("dragleave", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    transferDropZone.classList.remove("drag-over");
+  });
+
+  transferDropZone.addEventListener("drop", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    transferDropZone.classList.remove("drag-over");
+
+    if (!playdateConnected) {
+      console.log("No Playdate connection, ignoring drop");
+      return;
+    }
+
+    const files = e.dataTransfer.files;
+    console.log("Dropped", files.length, "file(s)");
+
+    // Log dropped files for now (actual transfer not implemented yet)
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      console.log("File:", file.name, "Type:", file.type, "Size:", file.size);
+    }
+
+    // Transfer files to Playdate
+    if (window.PlaydateTransfer) {
+      const totalFiles = files.length;
+      const transferProgressView = document.getElementById(
+        "transfer-progress-view",
+      );
+      const transferDropZone = document.getElementById("transfer-drop-zone");
+      const transferStatusText = document.getElementById(
+        "transfer-status-text",
+      );
+
+      // Show progress view, hide drop zone
+      if (transferProgressView && transferDropZone) {
+        transferDropZone.style.display = "none";
+        transferProgressView.classList.add("active");
+      }
+
+      // Start LED flickering to indicate transfer
+      setLEDTransferring(true);
+
+      // Progress callback to update UI
+      const onProgress = (current, total, fileName) => {
+        if (transferStatusText) {
+          transferStatusText.textContent = `Transferring ${current} of ${total} file${total !== 1 ? "s" : ""}`;
+        }
+        console.log(`Transferring ${current}/${total}: ${fileName}`);
+      };
+
+      window.PlaydateTransfer.transferFiles(files, onProgress)
+        .then((result) => {
+          // Stop LED flickering when transfer completes
+          setLEDTransferring(false);
+
+          if (result.failed === 0) {
+            console.log(
+              `✅ All ${result.success} file(s) transferred successfully!`,
+            );
+          } else if (result.success === 0) {
+            console.log(`❌ All ${result.failed} file(s) failed to transfer`);
+          } else {
+            console.log(
+              `⚠️ ${result.success} succeeded, ${result.failed} failed`,
+            );
+          }
+
+          // Show "Transfer finished" for 1 second
+          if (transferStatusText) {
+            transferStatusText.textContent = "Transfer finished";
+          }
+
+          setTimeout(() => {
+            // Return to drop zone view
+            if (transferProgressView && transferDropZone) {
+              transferProgressView.classList.remove("active");
+              transferDropZone.style.display = "flex";
+            }
+          }, 1000);
+        })
+        .catch((error) => {
+          // Stop LED flickering on error
+          setLEDTransferring(false);
+          console.error("Transfer error:", error);
+
+          // Show error and return to drop zone
+          if (transferStatusText) {
+            transferStatusText.textContent = "Transfer failed";
+          }
+
+          setTimeout(() => {
+            if (transferProgressView && transferDropZone) {
+              transferProgressView.classList.remove("active");
+              transferDropZone.style.display = "flex";
+            }
+          }, 1000);
+        });
+    } else {
+      console.error("PlaydateTransfer module not loaded");
+    }
+  });
+}

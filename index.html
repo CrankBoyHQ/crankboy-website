@@ -11,7 +11,7 @@
     <title>
       CrankBoy - A high performance Game Boy® emulator for the Playdate™
     </title>
-    <link rel="icon" type="image/x-icon" href="/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="favicon.png" />
     <link
       rel="preload"
       href="PressStart2P-basic.woff2"
@@ -237,6 +237,15 @@
           inset 0 1px 2px rgba(255, 255, 255, 0.3);
       }
 
+      .led-indicator.connected {
+        background-color: #0080ff;
+        box-shadow:
+          0 0 4px #0080ff,
+          0 0 8px #0080ff,
+          0 0 12px #0080ff,
+          inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      }
+
       @keyframes ledPulse {
         0% {
           opacity: 0;
@@ -254,6 +263,73 @@
 
       .led-indicator.blinking {
         animation: ledPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes ledTransferFlicker {
+        0%,
+        100% {
+          background-color: #0080ff;
+          box-shadow:
+            0 0 4px #0080ff,
+            0 0 8px #0080ff,
+            0 0 12px #0080ff,
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+        50% {
+          background-color: #ff1493;
+          box-shadow:
+            0 0 4px #ff1493,
+            0 0 8px #ff1493,
+            0 0 12px #ff1493,
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      .led-indicator.transferring {
+        animation: ledTransferFlicker 0.2s ease-in-out infinite;
+      }
+
+      .sync-roms-box {
+        position: absolute;
+        left: 93%;
+        top: 9.8%;
+        z-index: 30;
+        display: none;
+        align-items: center;
+      }
+
+      .sync-roms-box.visible {
+        display: flex;
+        animation: pointToMenu 2s ease-in-out infinite;
+      }
+
+      @keyframes pointToMenu {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(-10px);
+        }
+      }
+
+      .sync-roms-content {
+        background-color: #d1cfba;
+        border: 2px solid #000;
+        border-radius: 16px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .sync-roms-text {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(2vw, 10px);
+        color: #333;
+        white-space: nowrap;
+        line-height: 1;
       }
 
       .version-display {
@@ -481,6 +557,133 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+      }
+
+      .transfer-container {
+        position: absolute;
+        top: 5.85%;
+        left: 4.7%;
+        width: 78%;
+        aspect-ratio: 5 / 3;
+        z-index: 25;
+        display: none;
+        background-color: #d1ceb7;
+        overflow: hidden;
+      }
+
+      .transfer-container.active {
+        display: block;
+      }
+
+      .transfer-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10%;
+      }
+
+      .transfer-drop-zone {
+        width: 100%;
+        height: 100%;
+        border: 3px dashed #666;
+        border-radius: 8px;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .transfer-drop-zone.drag-over {
+        border-color: #333;
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .transfer-instruction-view {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .transfer-instruction-text {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(3vw, 12px);
+        color: #333;
+        text-align: center;
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+
+      .transfer-instruction-hint {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(1.8vw, 7px);
+        color: #555;
+        text-align: center;
+        line-height: 1.5;
+        padding: 0 10%;
+        max-width: 90%;
+      }
+
+      .transfer-text {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(3vw, 12px);
+        color: #333;
+        text-align: center;
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+
+      .transfer-hint {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(2vw, 8px);
+        color: #555;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .transfer-progress-view {
+        display: none;
+        position: absolute;
+        top: 5.85%;
+        left: 4.7%;
+        width: 78%;
+        aspect-ratio: 5 / 3;
+        z-index: 26;
+        pointer-events: none;
+      }
+
+      .transfer-progress-view.active {
+        display: block;
+      }
+
+      .transfer-logo {
+        position: absolute;
+        top: 42%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 45%;
+        height: auto;
+        aspect-ratio: 180 / 150;
+        pointer-events: none;
+      }
+
+      .transfer-status-text {
+        position: absolute;
+        top: 83%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(2.53vw, 14px);
+        color: #333;
+        text-align: center;
+        line-height: 1;
+        white-space: nowrap;
+        pointer-events: none;
       }
 
       .disclaimer {
@@ -727,6 +930,37 @@
               <source src="rubdubdub.mp4" type="video/mp4" />
             </video>
           </div>
+          <div class="transfer-container" id="transfer-container">
+            <div class="transfer-content" id="transfer-content">
+              <div
+                class="transfer-instruction-view"
+                id="transfer-instruction-view"
+              >
+                <p class="transfer-instruction-text">
+                  Press Menu Button and Select Playdate.
+                </p>
+                <p class="transfer-instruction-hint">
+                  Select the Playdate Device from in the File Browser. It may
+                  take some seconds until it shows up.
+                </p>
+              </div>
+              <div class="transfer-drop-zone" id="transfer-drop-zone">
+                <p class="transfer-text">Drag & Drop Files Here</p>
+                <p class="transfer-hint">.gb .gbc .gbz .pdi .png .jpg</p>
+              </div>
+            </div>
+          </div>
+          <div class="transfer-progress-view" id="transfer-progress-view">
+            <img
+              src="logo.png"
+              alt="CrankBoy Logo"
+              class="transfer-logo"
+              decoding="async"
+            />
+            <p class="transfer-status-text" id="transfer-status-text">
+              Transferring 0 of 0 files
+            </p>
+          </div>
           <div class="version-display" id="version-display"></div>
           <a href="#" class="button-up" aria-label="Up" id="button-up"></a>
           <a
@@ -753,6 +987,11 @@
             aria-label="Download"
           ></a>
           <a href="#" class="button-b" aria-label="B"></a>
+          <div class="sync-roms-box" id="sync-roms-box">
+            <div class="sync-roms-content">
+              <span class="sync-roms-text">Sync ROMs</span>
+            </div>
+          </div>
         </div>
         <div class="links">
           <a href="https://www.patreon.com/CrankBoy">Patreon</a>
@@ -790,6 +1029,8 @@
         </div>
       </div>
     </main>
+    <script src="playdateSerial.min.js" defer></script>
+    <script src="playdateTransfer.min.js" defer></script>
     <script src="app.min.js" defer></script>
   </body>
 </html>
