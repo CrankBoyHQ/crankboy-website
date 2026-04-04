@@ -230,8 +230,7 @@ function updateAButtonHref() {
   }
 }
 
-powerButton.addEventListener("click", function (e) {
-  e.preventDefault();
+function togglePower() {
   // Stop any playing video and reset combo when power button is pressed
   if (videoPlaying) {
     easterEggVideo.pause();
@@ -286,6 +285,11 @@ powerButton.addEventListener("click", function (e) {
     }, 1600);
   }
   updateAButtonHref();
+}
+
+powerButton.addEventListener("click", function (e) {
+  e.preventDefault();
+  togglePower();
 });
 
 menuButton.addEventListener("click", function (e) {
@@ -469,3 +473,113 @@ updateAButtonHref = function () {
   originalUpdateAButtonHref();
   updateVersionDisplay();
 };
+
+// Keyboard controls
+// Arrow keys = D-pad, A = B button, S = A button
+
+function triggerButtonActive(button) {
+  button.classList.add("keyboard-active");
+  setTimeout(function () {
+    button.classList.remove("keyboard-active");
+  }, 150);
+}
+
+document.addEventListener("keydown", function (e) {
+  // Prevent default scrolling for arrow keys and game buttons
+  if (
+    [
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "a",
+      "s",
+      "A",
+      "S",
+      "Escape",
+      " ",
+      "p",
+      "P",
+    ].includes(e.key)
+  ) {
+    e.preventDefault();
+  }
+
+  switch (e.key) {
+    case " ":
+    case "p":
+    case "P":
+      triggerButtonActive(powerButton);
+      togglePower();
+      break;
+    case "Escape":
+      triggerButtonActive(menuButton);
+      if (displayActive && !bootTimeout && inGame) {
+        inGame = false;
+        showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+      }
+      break;
+    case "ArrowUp":
+      triggerButtonActive(buttonUp);
+      if (displayActive && !bootTimeout && !inGame) {
+        currentImageIndex =
+          (currentImageIndex - 1 + menuImages.length) % menuImages.length;
+        showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+        const nextIndex =
+          (currentImageIndex - 1 + menuImages.length) % menuImages.length;
+        preloadImage("display/menu/" + menuImages[nextIndex] + ".webp");
+      }
+      checkCombo("up");
+      break;
+    case "ArrowDown":
+      triggerButtonActive(buttonDown);
+      if (displayActive && !bootTimeout && !inGame) {
+        currentImageIndex = (currentImageIndex + 1) % menuImages.length;
+        showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+        const nextIndex = (currentImageIndex + 1) % menuImages.length;
+        preloadImage("display/menu/" + menuImages[nextIndex] + ".webp");
+      }
+      checkCombo("down");
+      break;
+    case "ArrowLeft":
+      triggerButtonActive(buttonLeft);
+      if (displayActive && !bootTimeout && inGame) {
+        prevGameImage();
+      }
+      break;
+    case "ArrowRight":
+      triggerButtonActive(buttonRight);
+      if (displayActive && !bootTimeout && inGame) {
+        nextGameImage();
+      }
+      checkCombo("right");
+      break;
+    case "a":
+    case "A":
+      triggerButtonActive(buttonB);
+      // B button - previous game image in game mode, also part of combo
+      checkCombo("b");
+      if (displayActive && !bootTimeout && inGame) {
+        prevGameImage();
+      }
+      break;
+    case "s":
+    case "S":
+      triggerButtonActive(buttonA);
+      // A button - enter game or next image
+      if (displayActive && !bootTimeout) {
+        if (!inGame) {
+          const images = gameImages[menuImages[currentImageIndex]];
+          if (images && images.length > 0) {
+            inGame = true;
+            currentGameImageIndex = 0;
+            const folder = getSubfolder(menuImages[currentImageIndex]);
+            showImage(`display/${folder}/${images[0]}.webp`);
+          }
+        } else {
+          nextGameImage();
+        }
+      }
+      break;
+  }
+});
