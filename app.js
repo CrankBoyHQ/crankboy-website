@@ -266,9 +266,14 @@ powerButton.addEventListener("click", function (e) {
     // Start preloading display images only when user turns on display
     preloadDisplayImages();
     showImage("display/boot.webp");
-    bootTimeout = setTimeout(function () {
+    // Change background to black mid-boot to avoid flicker
+    setTimeout(function () {
       if (displayActive) {
         displayContainer.classList.add("on");
+      }
+    }, 800);
+    bootTimeout = setTimeout(function () {
+      if (displayActive) {
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
       }
       bootTimeout = null;
