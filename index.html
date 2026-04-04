@@ -413,11 +413,15 @@
         aspect-ratio: 5 / 3;
         z-index: 20;
         display: none;
-        background-color: #b1b1b1; /* Closer to Playdate's actual screen/image background */
+        background-color: #b1b1b1; /* Gray during boot animation */
       }
 
       .display-container.active {
         display: block;
+      }
+
+      .display-container.on {
+        background-color: #000; /* Black when display is fully on */
       }
 
       .display-content {

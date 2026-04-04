@@ -250,7 +250,7 @@ powerButton.addEventListener("click", function (e) {
   if (displayActive) {
     displayActive = false;
     inGame = false;
-    displayContainer.classList.remove("active");
+    displayContainer.classList.remove("active", "on");
     clearTimeout(bootTimeout);
     displayContent.innerHTML = "";
     if (currentObjectURL) {
@@ -267,8 +267,10 @@ powerButton.addEventListener("click", function (e) {
     preloadDisplayImages();
     showImage("display/boot.webp");
     bootTimeout = setTimeout(function () {
-      if (displayActive)
+      if (displayActive) {
+        displayContainer.classList.add("on");
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
+      }
       bootTimeout = null;
     }, 1600);
   }
