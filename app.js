@@ -913,4 +913,109 @@ if (transferDropZone) {
       console.error("PlaydateTransfer module not loaded");
     }
   });
+
+  // File select button handler
+  const selectBtn = document.getElementById("transfer-select-btn");
+  const fileInput = document.getElementById("transfer-file-input");
+
+  if (selectBtn && fileInput) {
+    selectBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (playdateConnected) {
+        fileInput.click();
+      } else {
+        console.log("No Playdate connection, cannot select files");
+      }
+    });
+
+    fileInput.addEventListener("change", function (e) {
+      const files = e.target.files;
+      if (files.length === 0) return;
+
+      console.log("Selected", files.length, "file(s)");
+
+      // Transfer files to Playdate
+      if (window.PlaydateTransfer) {
+        const totalFiles = files.length;
+        const transferProgressView = document.getElementById(
+          "transfer-progress-view",
+        );
+        const transferDropZone = document.getElementById("transfer-drop-zone");
+        const transferStatusText = document.getElementById(
+          "transfer-status-text",
+        );
+
+        // Show progress view, hide drop zone
+        if (transferProgressView && transferDropZone) {
+          transferDropZone.style.display = "none";
+          transferProgressView.classList.add("active");
+        }
+
+        // Start LED flickering to indicate transfer
+        setLEDTransferring(true);
+
+        // Progress callback to update UI
+        const onProgress = (current, total, fileName) => {
+          if (transferStatusText) {
+            transferStatusText.textContent = `Transferring ${current} of ${total} file${total !== 1 ? "s" : ""}`;
+          }
+          console.log(`Transferring ${current}/${total}: ${fileName}`);
+        };
+
+        window.PlaydateTransfer.transferFiles(files, onProgress)
+          .then((result) => {
+            // Stop LED flickering when transfer completes
+            setLEDTransferring(false);
+
+            if (result.failed === 0) {
+              console.log(
+                `✅ All ${result.success} file(s) transferred successfully!`,
+              );
+            } else if (result.success === 0) {
+              console.log(`❌ All ${result.failed} file(s) failed to transfer`);
+            } else {
+              console.log(
+                `⚠️ ${result.success} succeeded, ${result.failed} failed`,
+              );
+            }
+
+            // Show "Transfer finished" for 1 second
+            if (transferStatusText) {
+              transferStatusText.textContent = "Transfer finished";
+            }
+
+            setTimeout(() => {
+              // Return to drop zone view
+              if (transferProgressView && transferDropZone) {
+                transferProgressView.classList.remove("active");
+                transferDropZone.style.display = "flex";
+              }
+              // Reset file input
+              fileInput.value = "";
+            }, 1000);
+          })
+          .catch((error) => {
+            // Stop LED flickering on error
+            setLEDTransferring(false);
+            console.error("Transfer error:", error);
+
+            // Show error and return to drop zone
+            if (transferStatusText) {
+              transferStatusText.textContent = "Transfer failed";
+            }
+
+            setTimeout(() => {
+              if (transferProgressView && transferDropZone) {
+                transferProgressView.classList.remove("active");
+                transferDropZone.style.display = "flex";
+              }
+              // Reset file input
+              fileInput.value = "";
+            }, 1000);
+          });
+      } else {
+        console.error("PlaydateTransfer module not loaded");
+      }
+    });
+  }
 }

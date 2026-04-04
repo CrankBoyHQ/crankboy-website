@@ -644,6 +644,31 @@
         color: #555;
         text-align: center;
         line-height: 1.4;
+        margin-bottom: 15px;
+      }
+
+      .transfer-select-btn {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(2.5vw, 10px);
+        color: #d1cfba;
+        background-color: #000;
+        border: 2px solid #000;
+        border-radius: 16px;
+        padding: 8px 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .transfer-select-btn:hover {
+        background-color: #333;
+      }
+
+      .transfer-select-btn:active {
+        transform: translateY(1px);
+      }
+
+      .transfer-file-input {
+        display: none;
       }
 
       .transfer-progress-view {
@@ -947,6 +972,16 @@
               <div class="transfer-drop-zone" id="transfer-drop-zone">
                 <p class="transfer-text">Drag & Drop Files Here</p>
                 <p class="transfer-hint">.gb .gbc .gbz .pdi .png .jpg</p>
+                <button class="transfer-select-btn" id="transfer-select-btn">
+                  Select Files
+                </button>
+                <input
+                  type="file"
+                  id="transfer-file-input"
+                  class="transfer-file-input"
+                  multiple
+                  accept=".gb,.gbc,.gbz,.pdi,.png,.jpg,.jpeg,.gif"
+                />
               </div>
             </div>
           </div>
