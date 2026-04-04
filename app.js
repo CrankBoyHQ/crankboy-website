@@ -266,12 +266,12 @@ powerButton.addEventListener("click", function (e) {
     // Start preloading display images only when user turns on display
     preloadDisplayImages();
     showImage("display/boot.webp");
-    // Change background to black mid-boot to avoid flicker
+    // Start background fade 100ms after boot, finishes at 1400ms (200ms before boot ends)
     setTimeout(function () {
       if (displayActive) {
         displayContainer.classList.add("on");
       }
-    }, 800);
+    }, 100);
     // Hide version 200ms before boot ends (at 1400ms)
     setTimeout(function () {
       if (displayActive && bootTimeout) {
