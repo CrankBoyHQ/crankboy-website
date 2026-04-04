@@ -272,6 +272,12 @@ powerButton.addEventListener("click", function (e) {
         displayContainer.classList.add("on");
       }
     }, 800);
+    // Hide version 200ms before boot ends (at 1400ms)
+    setTimeout(function () {
+      if (displayActive && bootTimeout) {
+        versionDisplay.classList.remove("visible");
+      }
+    }, 1400);
     bootTimeout = setTimeout(function () {
       if (displayActive) {
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
@@ -420,10 +426,17 @@ startPowerButtonHint();
 const versionDisplay = document.getElementById("version-display");
 
 function updateVersionDisplay() {
-  // Only show version on main view (not in display or video playback)
-  if (displayActive || videoPlaying) {
+  // Show version on main view and during boot animation, hide during menu/game and video
+  if (videoPlaying) {
+    versionDisplay.classList.remove("visible");
+  } else if (displayActive && bootTimeout) {
+    // Show during boot animation
+    versionDisplay.classList.add("visible");
+  } else if (displayActive) {
+    // Hide when display is on but boot is complete (menu/game mode)
     versionDisplay.classList.remove("visible");
   } else {
+    // Show on main view
     versionDisplay.classList.add("visible");
   }
 }
