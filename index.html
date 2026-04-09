@@ -733,6 +733,15 @@
         border: 2px solid #000;
       }
 
+      /* Disable hover on touch devices to prevent stuck hover state */
+      @media (hover: none) {
+        .transfer-option-btn:hover {
+          background-color: #000;
+          color: #d1cfba;
+          border: 2px solid #000;
+        }
+      }
+
       .transfer-option-btn:active {
         transform: translateY(1px);
       }
