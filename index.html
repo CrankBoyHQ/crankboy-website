@@ -63,14 +63,9 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 100vh;
+        min-height: calc(100dvh - clamp(40px, 10vh, 120px));
         line-height: 1.6;
-      }
-
-      @media (max-width: 600px) {
-        body {
-          padding: 20px;
-        }
+        padding: clamp(20px, 5vh, 60px) clamp(10px, 3vw, 40px);
       }
 
       main {
