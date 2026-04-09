@@ -13,6 +13,11 @@ document
         e.preventDefault();
         return;
       }
+      // If in Web Serial flow (options or connect view), do nothing (button disabled)
+      if (showingOptionsView || awaitingSerialConnection) {
+        e.preventDefault();
+        return;
+      }
       // Otherwise show loading state
       var downloadBtn = document.querySelector(".download-btn-overlay");
       downloadBtn.querySelector(".btn-text").style.display = "none";
