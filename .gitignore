@@ -6,7 +6,8 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon
+
 
 # Volume root files
 .DocumentRevisions-V100
@@ -69,8 +70,6 @@ playground.xcworkspace
 *.moved-aside
 *.xcuserstate
 *.xcscmblueprint
-index.min.html
+
 *.gz
-app.min.js
-playdateSerial.min.js
-playdateTransfer.min.js
+*.min.*
