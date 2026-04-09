@@ -324,6 +324,7 @@ function playEasterEggVideo() {
   videoPlaying = true;
   videoContainer.classList.add("active");
   stopPowerButtonHint();
+  hideSyncRomsBox();
   updateAButtonHref();
   easterEggVideo.currentTime = 0;
   easterEggVideo.play().catch(function () {
@@ -435,6 +436,7 @@ function togglePower() {
     awaitingFolderSelection = false;
     displayContainer.classList.add("active");
     stopPowerButtonHint();
+    hideSyncRomsBox();
     // Start preloading display images only when user turns on display
     preloadDisplayImages();
     showImage("display/boot.webp");
