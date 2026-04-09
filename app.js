@@ -405,12 +405,16 @@ const A_BUTTON_DEFAULT_HREF =
   "https://github.com/CrankBoyHQ/crankboy-app/releases";
 
 function updateAButtonHref() {
-  // Show # link when in display mode, video is playing, or in WebUSB flow
+  // Show # link when in display mode, video is playing, or in transfer flow
+  const unsupportedView = document.getElementById(
+    "transfer-browser-unsupported-view",
+  );
   if (
     displayActive ||
     videoPlaying ||
     showingOptionsView ||
-    awaitingSerialConnection
+    awaitingSerialConnection ||
+    (unsupportedView && unsupportedView.classList.contains("active"))
   ) {
     buttonA.setAttribute("href", "#");
   } else {
@@ -523,6 +527,10 @@ menuButton.addEventListener("click", function (e) {
       showSyncRomsBox();
       // Update version display (will show since we're back on main view)
       updateVersionDisplay();
+      // Restart power button hint if display hasn't been activated
+      if (!displayEverActivated && !powerButtonHintInterval) {
+        startPowerButtonHint();
+      }
       // Reset A button href back to default
       updateAButtonHref();
       return;
@@ -549,6 +557,10 @@ menuButton.addEventListener("click", function (e) {
       showSyncRomsBox();
       // Update version display (will show since we're back on main view)
       updateVersionDisplay();
+      // Restart power button hint if display hasn't been activated
+      if (!displayEverActivated && !powerButtonHintInterval) {
+        startPowerButtonHint();
+      }
       // Reset A button href back to default
       updateAButtonHref();
       return;
