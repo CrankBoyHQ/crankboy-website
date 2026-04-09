@@ -611,10 +611,14 @@
       .transfer-instruction-view {
         width: 100%;
         height: 100%;
-        display: flex;
+        display: none;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+      }
+
+      .transfer-instruction-view.active {
+        display: flex;
       }
 
       .transfer-instruction-text {
@@ -672,6 +676,113 @@
 
       .transfer-select-btn:active {
         transform: translateY(1px);
+      }
+
+      .transfer-options-view {
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5%;
+      }
+
+      .transfer-options-view.active {
+        display: flex;
+      }
+
+      .transfer-options-title {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(2.5vw, 11px);
+        color: #333;
+        text-align: center;
+        margin-bottom: 15px;
+        line-height: 1.4;
+      }
+
+      .transfer-option-btn {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(2.2vw, 10px);
+        color: #d1cfba;
+        background-color: #000;
+        border: 2px solid #000;
+        border-radius: 16px;
+        padding: 10px 18px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 8px;
+        line-height: 1.4;
+        transition:
+          background-color 0.2s,
+          transform 0.1s;
+      }
+
+      .transfer-option-btn.large-text {
+        font-size: min(2.53vw, 14px);
+      }
+
+      .transfer-option-btn:hover {
+        background-color: transparent;
+        color: #000;
+        border: 2px solid #000;
+      }
+
+      .transfer-option-btn:active {
+        transform: translateY(1px);
+      }
+
+      .transfer-option-btn.hidden {
+        display: none;
+      }
+
+      .transfer-option-secondary {
+        background-color: transparent;
+        color: #333;
+        margin-top: 12px;
+      }
+
+      .transfer-option-secondary:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .transfer-option-badge {
+        font-size: min(1.5vw, 7px);
+        background-color: #ffc500;
+        color: #000;
+        padding: 2px 6px;
+        border-radius: 8px;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        line-height: 1;
+      }
+
+      .transfer-option-subtitle {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: min(1.5vw, 7px);
+        color: #555;
+        text-align: center;
+        margin-top: 6px;
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
+
+      .transfer-connect-view {
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .transfer-connect-view.active {
+        display: flex;
       }
 
       .transfer-file-input {
@@ -964,6 +1075,39 @@
           </div>
           <div class="transfer-container" id="transfer-container">
             <div class="transfer-content" id="transfer-content">
+              <div class="transfer-options-view" id="transfer-options-view">
+                <p class="transfer-options-title" id="options-title">
+                  Choose how you would like to sync ROMs
+                </p>
+                <a
+                  href="https://github.com/CrankBoyHQ/crankboy-manager/releases"
+                  class="transfer-option-btn"
+                  id="crankboy-manager-btn"
+                >
+                  <span class="transfer-option-text">Get CrankBoy Manager</span>
+                  <span class="transfer-option-badge" id="options-badge"
+                    >Recommended</span
+                  >
+                </a>
+                <p class="transfer-option-subtitle" id="options-subtitle">
+                  The convenient, multiplatform app to manage ROMs in CrankBoy.
+                </p>
+                <button
+                  class="transfer-option-btn transfer-option-secondary"
+                  id="webbrowser-btn"
+                >
+                  Use your Webbrowser
+                </button>
+              </div>
+              <div class="transfer-connect-view" id="transfer-connect-view">
+                <p class="transfer-instruction-text">
+                  Please connect your Playdate
+                </p>
+                <p class="transfer-instruction-hint">
+                  Ensure your Playdate is unlocked, then click the Menu Button
+                  to start the connection.
+                </p>
+              </div>
               <div
                 class="transfer-instruction-view"
                 id="transfer-instruction-view"
@@ -1031,13 +1175,13 @@
           <a href="#" class="button-b" aria-label="B"></a>
           <div class="sync-roms-box" id="sync-roms-box">
             <div class="sync-roms-content">
-              <span class="sync-roms-text">Sync ROMs</span>
+              <span class="sync-roms-text" id="sync-roms-text">Sync ROMs</span>
             </div>
           </div>
         </div>
         <div class="links">
           <a href="https://www.patreon.com/CrankBoy">Patreon</a>
-          <a href="https://github.com/CrankBoyHQ/crankboy-app">GitHub</a>
+          <a href="https://github.com/CrankBoyHQ">GitHub</a>
           <a href="https://github.com/CrankBoyHQ/crankboy-app/releases"
             >Releases</a
           >

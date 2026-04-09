@@ -84,16 +84,19 @@ let videoPlaying = false;
 let awaitingFolderSelection = false;
 let playdateConnected = false;
 let connectionPollInterval = null;
+let showingOptionsView = false;
+let awaitingSerialConnection = false;
 const CONNECTION_POLL_INTERVAL = 3000; // Check every 3 seconds
 const imageCache = {};
 let currentObjectURL = null;
 
 // Function to disconnect Playdate and reset UI
 function disconnectPlaydate() {
-  if (!playdateConnected) return;
-
+  // Reset all connection states
   playdateConnected = false;
   awaitingFolderSelection = false;
+  showingOptionsView = false;
+  awaitingSerialConnection = false;
   transferContainer.classList.remove("active");
 
   // Stop polling
@@ -112,20 +115,44 @@ function disconnectPlaydate() {
     );
   }
 
-  // Reset transfer views - show instruction, hide drop zone
+  // Hide all transfer views
+  const optionsView = document.getElementById("transfer-options-view");
+  const connectView = document.getElementById("transfer-connect-view");
   const instructionView = document.getElementById("transfer-instruction-view");
   const dropZone = document.getElementById("transfer-drop-zone");
-  if (instructionView && dropZone) {
-    instructionView.style.display = "flex";
+  const managerBtn = document.getElementById("crankboy-manager-btn");
+  const syncRomsBox = document.getElementById("sync-roms-box");
+  const syncRomsText = document.getElementById("sync-roms-text");
+
+  if (optionsView) {
+    optionsView.classList.remove("active");
+  }
+  if (connectView) {
+    connectView.classList.remove("active");
+  }
+  if (instructionView) {
+    instructionView.classList.remove("active");
+  }
+  if (dropZone) {
     dropZone.style.display = "none";
   }
-
-  console.log("Playdate disconnected (device no longer detected)");
+  if (managerBtn) {
+    managerBtn.classList.remove("large-text");
+  }
+  if (syncRomsBox) {
+    syncRomsBox.classList.remove("click-here");
+  }
+  if (syncRomsText) {
+    syncRomsText.textContent = "Sync ROMs";
+  }
 
   // Restart power button hint if display hasn't been activated
   if (!displayEverActivated && !powerButtonHintInterval) {
     startPowerButtonHint();
   }
+
+  // Reset A button href back to default
+  updateAButtonHref();
 }
 
 // LED control functions
@@ -216,7 +243,7 @@ function isTransferSupported() {
 const syncRomsBox = document.getElementById("sync-roms-box");
 
 function showSyncRomsBox() {
-  if (syncRomsBox && isTransferSupported()) {
+  if (syncRomsBox) {
     syncRomsBox.classList.add("visible");
   }
 }
@@ -362,8 +389,8 @@ const A_BUTTON_DEFAULT_HREF =
   "https://github.com/CrankBoyHQ/crankboy-app/releases";
 
 function updateAButtonHref() {
-  // Show # link when in display mode or video is playing
-  if (displayActive || videoPlaying) {
+  // Show # link when in display mode, video is playing, or in WebUSB flow
+  if (displayActive || videoPlaying || showingOptionsView || awaitingSerialConnection) {
     buttonA.setAttribute("href", "#");
   } else {
     buttonA.setAttribute("href", A_BUTTON_DEFAULT_HREF);
@@ -431,8 +458,8 @@ function togglePower() {
 powerButton.addEventListener("click", function (e) {
   e.preventDefault();
 
-  // If Playdate is connected, disconnect instead of toggling display
-  if (playdateConnected) {
+  // If Playdate is connected or showing transfer views, disconnect/close instead of toggling display
+  if (playdateConnected || showingOptionsView || awaitingSerialConnection) {
     disconnectPlaydate();
     return;
   }
@@ -445,6 +472,82 @@ menuButton.addEventListener("click", function (e) {
 
   // In main view (display off), handle Playdate connection flow
   if (!displayActive && !videoPlaying) {
+    // If showing options view, dismiss it (second press)
+    if (showingOptionsView) {
+      showingOptionsView = false;
+      transferContainer.classList.remove("active");
+      const optionsView = document.getElementById("transfer-options-view");
+      const managerBtn = document.getElementById("crankboy-manager-btn");
+      const syncRomsBox = document.getElementById("sync-roms-box");
+      const syncRomsText = document.getElementById("sync-roms-text");
+      if (optionsView) {
+        optionsView.classList.remove("active");
+      }
+      // Remove large-text class if it was applied
+      if (managerBtn) {
+        managerBtn.classList.remove("large-text");
+      }
+      // Reset sync roms box
+      if (syncRomsBox) {
+        syncRomsBox.classList.remove("click-here");
+      }
+      if (syncRomsText) {
+        syncRomsText.textContent = "Sync ROMs";
+      }
+      // Reset A button href back to default
+      updateAButtonHref();
+      return;
+    }
+
+    // If awaiting serial connection, start the actual connection (third press)
+    if (awaitingSerialConnection) {
+      // Start serial connection
+      if (window.PlaydateSerial) {
+        window.PlaydateSerial.enterDataDiskMode().then((success) => {
+          if (success) {
+            // Only hide connect view and proceed on successful connection
+            awaitingSerialConnection = false;
+            const connectView = document.getElementById("transfer-connect-view");
+            if (connectView) {
+              connectView.classList.remove("active");
+            }
+
+            // Reset A button href back to default
+            updateAButtonHref();
+
+            awaitingFolderSelection = true;
+            playdateConnected = true;
+            stopPowerButtonHint();
+            // Turn on LED blue to show connection established
+            if (ledIndicator) {
+              ledIndicator.classList.add("connected");
+            }
+            // Hide and reset the sync ROMs box since user is now connected
+            hideSyncRomsBox();
+            const syncRomsBox = document.getElementById("sync-roms-box");
+            const syncRomsText = document.getElementById("sync-roms-text");
+            if (syncRomsBox) {
+              syncRomsBox.classList.remove("click-here");
+            }
+            if (syncRomsText) {
+              syncRomsText.textContent = "Sync ROMs";
+            }
+            // Show instruction view
+            const instructionView = document.getElementById(
+              "transfer-instruction-view",
+            );
+            if (instructionView) {
+              instructionView.classList.add("active");
+            }
+          }
+          // If not successful (user cancelled), keep connect view visible so they can try again
+        });
+      } else {
+        console.error("PlaydateSerial module not loaded");
+      }
+      return;
+    }
+
     // If already connected but no folder selected, open folder picker
     if (playdateConnected) {
       if (window.PlaydateTransfer) {
@@ -463,8 +566,10 @@ menuButton.addEventListener("click", function (e) {
               "transfer-instruction-view",
             );
             const dropZone = document.getElementById("transfer-drop-zone");
-            if (instructionView && dropZone) {
-              instructionView.style.display = "none";
+            if (instructionView) {
+              instructionView.classList.remove("active");
+            }
+            if (dropZone) {
               dropZone.style.display = "flex";
             }
             // Start polling only after folder is selected
@@ -477,33 +582,70 @@ menuButton.addEventListener("click", function (e) {
       return;
     }
 
-    // First press: trigger serial connection
-    if (window.PlaydateSerial) {
-      window.PlaydateSerial.enterDataDiskMode().then((success) => {
-        if (success) {
-          awaitingFolderSelection = true;
-          playdateConnected = true;
-          transferContainer.classList.add("active");
-          stopPowerButtonHint();
-          // Turn on LED blue to show connection established
-          if (ledIndicator) {
-            ledIndicator.classList.add("connected");
-          }
-          // Hide the sync ROMs box since user is now connected
-          hideSyncRomsBox();
-          // Show instruction view initially
-          const instructionView = document.getElementById(
-            "transfer-instruction-view",
-          );
-          if (instructionView) {
-            instructionView.style.display = "flex";
-          }
-          // Don't start polling yet - wait for folder selection
-        }
-      });
-    } else {
-      console.error("PlaydateSerial module not loaded");
+    // First press: show options view
+    showingOptionsView = true;
+    transferContainer.classList.add("active");
+    hideSyncRomsBox();
+    stopPowerButtonHint();
+
+    const optionsView = document.getElementById("transfer-options-view");
+    const connectView = document.getElementById("transfer-connect-view");
+    const instructionView = document.getElementById("transfer-instruction-view");
+    const dropZone = document.getElementById("transfer-drop-zone");
+    const webbrowserBtn = document.getElementById("webbrowser-btn");
+    const optionsTitle = document.getElementById("options-title");
+    const optionsBadge = document.getElementById("options-badge");
+    const managerBtn = document.getElementById("crankboy-manager-btn");
+
+    // Hide all other views first
+    if (connectView) {
+      connectView.classList.remove("active");
     }
+    if (instructionView) {
+      instructionView.classList.remove("active");
+    }
+    if (dropZone) {
+      dropZone.style.display = "none";
+    }
+
+    if (optionsView) {
+      optionsView.classList.add("active");
+    }
+
+    // On non-Chromium browsers, only show CrankBoy Manager option (no title, no badge)
+    if (isTransferSupported()) {
+      // Chromium browser - show all options with smaller text
+      if (webbrowserBtn) {
+        webbrowserBtn.classList.remove("hidden");
+      }
+      if (optionsTitle) {
+        optionsTitle.style.display = "";
+      }
+      if (optionsBadge) {
+        optionsBadge.style.display = "";
+      }
+      if (managerBtn) {
+        managerBtn.classList.remove("large-text");
+      }
+    } else {
+      // Non-Chromium browser - hide webbrowser option, title, and badge, use larger text
+      if (webbrowserBtn) {
+        webbrowserBtn.classList.add("hidden");
+      }
+      if (optionsTitle) {
+        optionsTitle.style.display = "none";
+      }
+      if (optionsBadge) {
+        optionsBadge.style.display = "none";
+      }
+      if (managerBtn) {
+        managerBtn.classList.add("large-text");
+      }
+    }
+
+    // Update A button href to point to CrankBoy Manager
+    updateAButtonHref();
+
     return;
   }
 
@@ -515,6 +657,43 @@ menuButton.addEventListener("click", function (e) {
   inGame = false;
   showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
 });
+
+// Handle "Use your Webbrowser" button click
+const webbrowserBtn = document.getElementById("webbrowser-btn");
+if (webbrowserBtn) {
+  webbrowserBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    // Hide options view
+    const optionsView = document.getElementById("transfer-options-view");
+    if (optionsView) {
+      optionsView.classList.remove("active");
+    }
+
+    // Show intermediate "Please connect your Playdate" step
+    showingOptionsView = false;
+    awaitingSerialConnection = true;
+
+    const connectView = document.getElementById("transfer-connect-view");
+    if (connectView) {
+      connectView.classList.add("active");
+    }
+
+    // Update sync roms box to "Click here" mode
+    const syncRomsBox = document.getElementById("sync-roms-box");
+    const syncRomsText = document.getElementById("sync-roms-text");
+    if (syncRomsBox) {
+      syncRomsBox.classList.add("click-here");
+      syncRomsBox.classList.add("visible");
+    }
+    if (syncRomsText) {
+      syncRomsText.textContent = "Click here";
+    }
+
+    // Update A button href (still points to Manager in connect view)
+    updateAButtonHref();
+  });
+}
 
 buttonUp.addEventListener("click", function (e) {
   e.preventDefault();
