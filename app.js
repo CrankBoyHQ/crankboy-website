@@ -158,6 +158,9 @@ function disconnectPlaydate() {
     startPowerButtonHint();
   }
 
+  // Update version display (will show since we're back on main view)
+  updateVersionDisplay();
+
   // Show sync ROMs box when returning to main view
   showSyncRomsBox();
 
@@ -330,6 +333,8 @@ function playEasterEggVideo() {
   videoContainer.classList.add("active");
   stopPowerButtonHint();
   hideSyncRomsBox();
+  // Update version display (will hide since video is playing)
+  updateVersionDisplay();
   updateAButtonHref();
   easterEggVideo.currentTime = 0;
   easterEggVideo.play().catch(function () {
@@ -428,6 +433,8 @@ function togglePower() {
     }
     // Show sync ROMs box when returning to main view
     showSyncRomsBox();
+    // Update version display (will show since we're back on main view)
+    updateVersionDisplay();
     return; // Return to main view, don't activate display mode
   }
   resetCombo();
@@ -443,6 +450,8 @@ function togglePower() {
     }
     // Show sync ROMs box when returning to main view
     showSyncRomsBox();
+    // Update version display (will show since we're back on main view)
+    updateVersionDisplay();
   } else {
     displayActive = true;
     displayEverActivated = true;
@@ -451,6 +460,8 @@ function togglePower() {
     displayContainer.classList.add("active");
     stopPowerButtonHint();
     hideSyncRomsBox();
+    // Update version display (will hide since display is on)
+    updateVersionDisplay();
     // Start preloading display images only when user turns on display
     preloadDisplayImages();
     showImage("display/boot.webp");
@@ -460,12 +471,6 @@ function togglePower() {
         displayContainer.classList.add("on");
       }
     }, 100);
-    // Hide version 200ms before boot ends (at 1400ms)
-    setTimeout(function () {
-      if (displayActive && bootTimeout) {
-        versionDisplay.classList.remove("visible");
-      }
-    }, 1400);
     bootTimeout = setTimeout(function () {
       if (displayActive) {
         showImage("display/menu/" + menuImages[currentImageIndex] + ".webp");
@@ -487,6 +492,8 @@ powerButton.addEventListener("click", function (e) {
     transferContainer.classList.remove("active");
     unsupportedView.classList.remove("active");
     showSyncRomsBox();
+    // Update version display (will show since we're back on main view)
+    updateVersionDisplay();
     updateAButtonHref();
     return;
   }
@@ -514,6 +521,8 @@ menuButton.addEventListener("click", function (e) {
       unsupportedView.classList.remove("active");
       // Show sync ROMs box when returning to main view
       showSyncRomsBox();
+      // Update version display (will show since we're back on main view)
+      updateVersionDisplay();
       // Reset A button href back to default
       updateAButtonHref();
       return;
@@ -538,6 +547,8 @@ menuButton.addEventListener("click", function (e) {
       }
       // Show sync ROMs box when returning to main view
       showSyncRomsBox();
+      // Update version display (will show since we're back on main view)
+      updateVersionDisplay();
       // Reset A button href back to default
       updateAButtonHref();
       return;
@@ -645,6 +656,9 @@ menuButton.addEventListener("click", function (e) {
     transferContainer.classList.add("active");
     hideSyncRomsBox();
     stopPowerButtonHint();
+
+    // Update version display (will hide since we're in transfer flow)
+    updateVersionDisplay();
 
     const optionsView = document.getElementById("transfer-options-view");
     const connectView = document.getElementById("transfer-connect-view");
@@ -888,17 +902,16 @@ startPowerButtonHint();
 const versionDisplay = document.getElementById("version-display");
 
 function updateVersionDisplay() {
-  // Show version on main view and during boot animation, hide during menu/game and video
-  if (videoPlaying) {
-    versionDisplay.classList.remove("visible");
-  } else if (displayActive && bootTimeout) {
-    // Show during boot animation
-    versionDisplay.classList.add("visible");
-  } else if (displayActive) {
-    // Hide when display is on but boot is complete (menu/game mode)
+  // Version is only shown on main view
+  // Hide when: transfer UI is active, display is on, or video is playing
+  if (
+    transferContainer.classList.contains("active") ||
+    displayActive ||
+    videoPlaying
+  ) {
     versionDisplay.classList.remove("visible");
   } else {
-    // Show on main view
+    // Show on main view only
     versionDisplay.classList.add("visible");
   }
 }
