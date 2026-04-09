@@ -522,16 +522,7 @@ menuButton.addEventListener("click", function (e) {
             if (ledIndicator) {
               ledIndicator.classList.add("connected");
             }
-            // Hide and reset the sync ROMs box since user is now connected
-            hideSyncRomsBox();
-            const syncRomsBox = document.getElementById("sync-roms-box");
-            const syncRomsText = document.getElementById("sync-roms-text");
-            if (syncRomsBox) {
-              syncRomsBox.classList.remove("click-here");
-            }
-            if (syncRomsText) {
-              syncRomsText.textContent = "Sync ROMs";
-            }
+            // Keep sync roms box visible with "Click here" for the second stage
             // Show instruction view
             const instructionView = document.getElementById(
               "transfer-instruction-view",
@@ -566,14 +557,35 @@ menuButton.addEventListener("click", function (e) {
               "transfer-instruction-view",
             );
             const dropZone = document.getElementById("transfer-drop-zone");
+            const syncRomsBox = document.getElementById("sync-roms-box");
+            const syncRomsText = document.getElementById("sync-roms-text");
             if (instructionView) {
               instructionView.classList.remove("active");
             }
             if (dropZone) {
               dropZone.style.display = "flex";
             }
+            // Hide and reset sync roms box when ready to transfer
+            hideSyncRomsBox();
+            if (syncRomsBox) {
+              syncRomsBox.classList.remove("click-here");
+            }
+            if (syncRomsText) {
+              syncRomsText.textContent = "Sync ROMs";
+            }
             // Start polling only after folder is selected
             startConnectionPolling();
+          } else {
+            // User cancelled or selected wrong folder - show Click here indicator again
+            const syncRomsBox = document.getElementById("sync-roms-box");
+            const syncRomsText = document.getElementById("sync-roms-text");
+            if (syncRomsBox) {
+              syncRomsBox.classList.add("click-here");
+              syncRomsBox.classList.add("visible");
+            }
+            if (syncRomsText) {
+              syncRomsText.textContent = "Click here";
+            }
           }
         });
       } else {
