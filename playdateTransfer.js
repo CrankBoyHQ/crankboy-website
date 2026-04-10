@@ -457,10 +457,10 @@
 
       if (result.success) {
         successCount++;
-        console.log("✅", result.message);
+        console.log("[OK]", result.message);
       } else {
         failedCount++;
-        console.log("❌", result.message);
+        console.log("[FAIL]", result.message);
       }
     }
 

@@ -401,8 +401,7 @@ function getSubfolder(menuImg) {
   return menuImg.replace(/_a$/, "");
 }
 
-const A_BUTTON_DEFAULT_HREF =
-  "https://github.com/CrankBoyHQ/crankboy-app/releases";
+const A_BUTTON_DEFAULT_HREF = "https://play.date/games/crankboy/";
 
 function updateAButtonHref() {
   // Show # link when in display mode, video is playing, or in transfer flow
@@ -1135,14 +1134,12 @@ if (transferDropZone) {
 
           if (result.failed === 0) {
             console.log(
-              `✅ All ${result.success} file(s) transferred successfully!`,
+              `All ${result.success} file(s) transferred successfully!`,
             );
           } else if (result.success === 0) {
-            console.log(`❌ All ${result.failed} file(s) failed to transfer`);
+            console.log(`All ${result.failed} file(s) failed to transfer`);
           } else {
-            console.log(
-              `⚠️ ${result.success} succeeded, ${result.failed} failed`,
-            );
+            console.log(`${result.success} succeeded, ${result.failed} failed`);
           }
 
           // Show "Transfer finished" for 1 second
@@ -1235,13 +1232,13 @@ if (transferDropZone) {
 
             if (result.failed === 0) {
               console.log(
-                `✅ All ${result.success} file(s) transferred successfully!`,
+                `All ${result.success} file(s) transferred successfully!`,
               );
             } else if (result.success === 0) {
-              console.log(`❌ All ${result.failed} file(s) failed to transfer`);
+              console.log(`All ${result.failed} file(s) failed to transfer`);
             } else {
               console.log(
-                `⚠️ ${result.success} succeeded, ${result.failed} failed`,
+                `${result.success} succeeded, ${result.failed} failed`,
               );
             }
 

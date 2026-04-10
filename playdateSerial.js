@@ -125,7 +125,7 @@
     // (Playdate will disconnect anyway when it reboots into Data Disk mode)
     await closePort(port);
 
-    console.log("✅ Playdate rebooting into Data Disk mode...");
+    console.log("Playdate rebooting into Data Disk mode...");
     console.log(
       "⏳ Wait for Playdate to appear as a disk, then press MENU button again to select folder",
     );
