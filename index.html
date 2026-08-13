@@ -88,7 +88,7 @@
         font-size: clamp(0.7rem, 2.53vw, 0.9rem);
         color: #333;
         text-align: center;
-        margin-bottom: clamp(25px, 6.3vw, 35px);
+        margin-bottom: clamp(15px, 6.3vw, 20px);
         line-height: 1.4;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -107,28 +107,32 @@
       .playdate-container {
         position: relative;
         display: inline-block;
-        max-width: 514px;
+        max-width: 550px;
         width: 100%;
         margin-bottom: 30px;
       }
 
       .playdate-image {
+        position: relative;
+        z-index: 26; /* Above screen containers (20/25) so device frame masks edges */
+        pointer-events: none; /* Let clicks pass through to containers below */
         width: 100%;
         height: auto;
-        aspect-ratio: 513 / 509;
+        aspect-ratio: 550 / 550;
         display: block;
         filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
       }
 
       .logo-overlay {
         position: absolute;
-        top: 25.7%;
-        left: 43.7%;
+        top: 26%;
+        left: 42.5%;
         transform: translate(-50%, -50%);
-        width: 35%;
+        width: 32.6%;
         height: auto;
         aspect-ratio: 180 / 150;
         pointer-events: none;
+        z-index: 20; /* Above backdrop (19); display-container (20, later in DOM) covers it when active */
       }
 
       .links {
@@ -163,7 +167,7 @@
       .download-btn-overlay {
         position: absolute;
         bottom: 47.8%;
-        left: 43.7%;
+        left: 42.5%;
         transform: translate(-50%, -50%);
         background-color: #000;
         color: #d1cfba;
@@ -182,6 +186,15 @@
         justify-content: center;
         line-height: 1;
         white-space: nowrap;
+        z-index: 30; /* Above playdate-image (26) */
+      }
+
+      /* Hide catalog button while screen content is active (sits above image, would overlap) */
+      .playdate-container:has(.display-container.active) .download-btn-overlay,
+      .playdate-container:has(.video-container.active) .download-btn-overlay,
+      .playdate-container:has(.transfer-container.active)
+        .download-btn-overlay {
+        visibility: hidden;
       }
 
       .download-btn-overlay:hover,
@@ -205,15 +218,15 @@
       .button-power {
         position: absolute;
         top: 1%;
-        left: 78.1%;
+        left: 75.8%;
         transform: translate(-50%, -50%);
-        width: 11%;
-        aspect-ratio: 7 / 1;
+        width: 7.9%;
+        aspect-ratio: 5 / 1;
         background-color: transparent;
-        border-top-left-radius: 35%;
-        border-top-right-radius: 35%;
+        border-top-left-radius: 50%;
+        border-top-right-radius: 50%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-power:active,
@@ -224,13 +237,13 @@
 
       .led-indicator {
         position: absolute;
-        top: -0.4%;
-        left: 73.8%;
+        top: -0.3%;
+        left: 72.8%;
         width: 1.5%;
-        aspect-ratio: 4 / 1;
+        aspect-ratio: 3 / 1;
         background-color: transparent;
         border-radius: 50% 50% 0 0;
-        z-index: 15;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .led-indicator.active {
@@ -296,9 +309,9 @@
 
       .sync-roms-box {
         position: absolute;
-        left: 93%;
-        top: 9.8%;
-        z-index: 30;
+        left: 92%;
+        top: 16.2%;
+        z-index: 40; /* Above playdate-image (26) and other UI (30) */
         display: none;
         align-items: center;
       }
@@ -319,7 +332,7 @@
       }
 
       .sync-roms-content {
-        background-color: #d1cfba;
+        background-color: #b9c2d2;
         border: 2px solid #000;
         border-radius: 16px;
         padding: 8px 12px;
@@ -346,13 +359,13 @@
 
       .version-display {
         position: absolute;
-        top: 6%;
-        left: 5.2%;
+        top: 7.5%;
+        left: 6.2%;
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2.5vw, 10px);
         color: #333;
         text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-        z-index: 25; /* Above display-container (20) to show during boot */
+        z-index: 27; /* Above playdate-image (26) to show during boot */
         pointer-events: none;
         visibility: hidden;
         min-height: 1.2em;
@@ -366,15 +379,15 @@
 
       .button-menu {
         position: absolute;
-        top: 12.75%;
-        left: 89.45%;
+        top: 18.8%;
+        left: 87%;
         transform: translate(-50%, -50%);
-        width: 5%;
+        width: 6%;
         aspect-ratio: 1 / 1;
         background-color: transparent;
         border-radius: 50%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-menu:active,
@@ -385,15 +398,15 @@
 
       .button-a {
         position: absolute;
-        top: 70.8%;
-        left: 75.8%;
+        top: 71.8%;
+        left: 74.2%;
         transform: translate(-50%, -50%);
-        width: 10.5%;
+        width: 12.5%;
         aspect-ratio: 1 / 1;
         background-color: transparent;
         border-radius: 50%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-a:active,
@@ -404,15 +417,15 @@
 
       .button-b {
         position: absolute;
-        top: 70.8%;
-        left: 57.5%;
+        top: 71.8%;
+        left: 54.5%;
         transform: translate(-50%, -50%);
-        width: 10.5%;
+        width: 12.5%;
         aspect-ratio: 1 / 1;
         background-color: transparent;
         border-radius: 50%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-b:active,
@@ -423,16 +436,16 @@
 
       .button-up {
         position: absolute;
-        top: 68.7%;
-        left: 20%;
+        top: 68.9%;
+        left: 22.7%;
         transform: translate(-50%, -50%);
-        width: 5.4%;
+        width: 7%;
         height: 7.8%;
         background-color: transparent;
         border-top-left-radius: 40%;
         border-top-right-radius: 40%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-up:active,
@@ -443,16 +456,16 @@
 
       .button-down {
         position: absolute;
-        top: 82%;
-        left: 20%;
+        top: 83.7%;
+        left: 22.7%;
         transform: translate(-50%, -50%);
-        width: 5.4%;
+        width: 7%;
         height: 7.8%;
         background-color: transparent;
         border-bottom-left-radius: 40%;
         border-bottom-right-radius: 40%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-down:active,
@@ -463,16 +476,16 @@
 
       .button-left {
         position: absolute;
-        top: 75.4%;
-        left: 13.45%;
+        top: 76.4%;
+        left: 15.4%;
         transform: translate(-50%, -50%);
-        height: 5.4%;
+        height: 7%;
         width: 7.8%;
         background-color: transparent;
         border-top-left-radius: 40%;
         border-bottom-left-radius: 40%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-left:active,
@@ -483,16 +496,16 @@
 
       .button-right {
         position: absolute;
-        top: 75.4%;
-        left: 26.7%;
+        top: 76.4%;
+        left: 30.1%;
         transform: translate(-50%, -50%);
-        height: 5.4%;
+        height: 7%;
         width: 7.8%;
         background-color: transparent;
         border-top-right-radius: 40%;
         border-bottom-right-radius: 40%;
         cursor: pointer;
-        z-index: 10;
+        z-index: 30; /* Above playdate-image (26) */
       }
 
       .button-right:active,
@@ -503,13 +516,13 @@
 
       .display-container {
         position: absolute;
-        top: 5.85%;
-        left: 4.7%;
-        width: 78%;
+        top: 6%;
+        left: 3.05%;
+        width: 79%;
         aspect-ratio: 5 / 3;
-        z-index: 20;
+        z-index: 20; /* Below playdate-image (26) so device frame masks edges */
         display: none;
-        background-color: #b1b1b1; /* Gray during boot animation */
+        background-color: #a8a59d; /* Gray during boot animation */
         transition: background-color 1.4s ease-in;
       }
 
@@ -517,8 +530,16 @@
         display: block;
       }
 
-      .display-container.on {
-        background-color: #000; /* Black when display is fully on */
+      /* Static gray screen backdrop — visible on page load behind logo/version/button */
+      .playdate-container::before {
+        content: "";
+        position: absolute;
+        top: 5.85%;
+        left: 3.55%;
+        width: 78%;
+        aspect-ratio: 5 / 3;
+        background-color: #a8a59d;
+        z-index: 19; /* Below display/video/transfer (20/25) and image (26) */
       }
 
       .display-content {
@@ -552,10 +573,10 @@
       .video-container {
         position: absolute;
         top: 5.85%;
-        left: 4.7%;
+        left: 3.55%;
         width: 78%;
         aspect-ratio: 5 / 3;
-        z-index: 25;
+        z-index: 25; /* Below playdate-image (26) */
         display: none;
         background-color: #000;
         overflow: hidden;
@@ -574,12 +595,12 @@
       .transfer-container {
         position: absolute;
         top: 5.85%;
-        left: 4.7%;
+        left: 3.55%;
         width: 78%;
         aspect-ratio: 5 / 3;
-        z-index: 25;
+        z-index: 25; /* Below playdate-image (26) */
         display: none;
-        background-color: #d1ceb7;
+        background-color: #a8a59d;
         overflow: hidden;
       }
 
@@ -817,10 +838,10 @@
         display: none;
         position: absolute;
         top: 5.85%;
-        left: 4.7%;
+        left: 3.55%;
         width: 78%;
         aspect-ratio: 5 / 3;
-        z-index: 26;
+        z-index: 27; /* Above transfer-container (25) and playdate-image (26) */
         pointer-events: none;
       }
 
@@ -1040,17 +1061,17 @@
       <div class="container">
         <div class="playdate-container">
           <picture>
-            <source srcset="playdate.webp" type="image/webp" />
-            <source srcset="playdate.png" type="image/png" />
+            <source srcset="playdate_new.webp" type="image/webp" />
+            <source srcset="playdate_new.png" type="image/png" />
             <img
-              src="playdate.png"
+              src="playdate_new.png"
               alt="Playdate console with CrankBoy"
               class="playdate-image"
               decoding="async"
               fetchpriority="high"
               loading="eager"
-              width="513"
-              height="509"
+              width="2154"
+              height="2154"
             />
           </picture>
           <picture>
