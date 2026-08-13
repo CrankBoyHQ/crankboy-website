@@ -256,7 +256,8 @@ function isTransferSupported() {
 const syncRomsBox = document.getElementById("sync-roms-box");
 
 function showSyncRomsBox() {
-  if (syncRomsBox) {
+  // Never show while gallery or video view is active
+  if (syncRomsBox && !displayActive && !videoPlaying) {
     syncRomsBox.classList.add("visible");
   }
 }
