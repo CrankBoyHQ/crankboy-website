@@ -25,26 +25,59 @@ document
     });
   });
 
-function isLinux() {
+function getPlatform() {
+  let platform = "";
   if (navigator.userAgentData && navigator.userAgentData.platform) {
-    return /linux/i.test(navigator.userAgentData.platform);
+    platform = navigator.userAgentData.platform;
+  } else {
+    platform = navigator.platform || navigator.userAgent || "";
   }
-  return (
-    /linux/i.test(navigator.platform || "") ||
-    /linux/i.test(navigator.userAgent || "")
-  );
+  if (/linux/i.test(platform)) return "linux";
+  if (/mac/i.test(platform)) return "macos";
+  if (/win/i.test(platform)) return "windows";
+  return "unknown";
 }
 
 const FLATHUB_MANAGER_URL =
   "https://flathub.org/en/apps/app.crankboy.crankboy-manager";
+const MANAGER_LATEST_API =
+  "https://api.github.com/repos/CrankBoyHQ/crankboy-manager/releases/latest";
 
-if (isLinux()) {
+function setManagerLinks(url) {
   ["crankboy-manager-btn", "unsupported-manager-btn"].forEach(function (id) {
     const el = document.getElementById(id);
     if (el) {
-      el.setAttribute("href", FLATHUB_MANAGER_URL);
+      el.setAttribute("href", url);
     }
   });
+}
+
+const managerPlatform = getPlatform();
+
+if (managerPlatform === "linux") {
+  setManagerLinks(FLATHUB_MANAGER_URL);
+} else if (managerPlatform === "macos" || managerPlatform === "windows") {
+  const assetSuffix =
+    managerPlatform === "macos" ? "-macos.zip" : "-windows.zip";
+  fetch(MANAGER_LATEST_API, {
+    headers: { Accept: "application/vnd.github+json" },
+  })
+    .then(function (response) {
+      if (!response.ok) throw new Error("GitHub API error");
+      return response.json();
+    })
+    .then(function (data) {
+      const assets = data && data.assets ? data.assets : [];
+      const asset = assets.find(function (a) {
+        return a && typeof a.name === "string" && a.name.endsWith(assetSuffix);
+      });
+      if (asset && asset.browser_download_url) {
+        setManagerLinks(asset.browser_download_url);
+      }
+    })
+    .catch(function () {
+      // Leave default GitHub releases href on failure
+    });
 }
 
 function resetButton() {
