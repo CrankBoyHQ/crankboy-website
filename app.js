@@ -25,6 +25,28 @@ document
     });
   });
 
+function isLinux() {
+  if (navigator.userAgentData && navigator.userAgentData.platform) {
+    return /linux/i.test(navigator.userAgentData.platform);
+  }
+  return (
+    /linux/i.test(navigator.platform || "") ||
+    /linux/i.test(navigator.userAgent || "")
+  );
+}
+
+const FLATHUB_MANAGER_URL =
+  "https://flathub.org/en/apps/app.crankboy.crankboy-manager";
+
+if (isLinux()) {
+  ["crankboy-manager-btn", "unsupported-manager-btn"].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.setAttribute("href", FLATHUB_MANAGER_URL);
+    }
+  });
+}
+
 function resetButton() {
   const downloadBtn = document.querySelector(".download-btn-overlay");
   downloadBtn.querySelector(".btn-text").style.display = "inline";
