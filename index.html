@@ -112,6 +112,8 @@
         max-width: 550px;
         width: 100%;
         margin-bottom: 30px;
+        container-type: inline-size;
+        --u: calc(100cqw / 550);
       }
 
       .playdate-image {
@@ -175,11 +177,13 @@
         color: #d1cfba;
         padding: 0.5em 0.45em 0.4em 0.6em;
         font-size: min(2.53vw, 14px);
+        font-size: calc(var(--u) * 14);
         font-weight: bold;
         text-decoration: none;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         border: 2px solid transparent;
+        border: calc(var(--u) * 2) solid transparent;
         border-radius: 0.8em;
         font-family: "Press Start 2P", "Courier New", monospace;
         cursor: pointer;
@@ -365,13 +369,14 @@
         left: 6.2%;
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2.5vw, 10px);
+        font-size: calc(var(--u) * 10);
         color: #333;
         text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
         z-index: 27; /* Above playdate-image (26) to show during boot */
         pointer-events: none;
         visibility: hidden;
         min-height: 1.2em;
-        min-width: 60px;
+        min-width: calc(var(--u) * 60);
         contain: layout;
       }
 
@@ -623,7 +628,9 @@
         width: 100%;
         height: 100%;
         border: 3px dashed #666;
+        border: calc(var(--u) * 3) dashed #666;
         border-radius: 8px;
+        border-radius: calc(var(--u) * 8);
         display: none;
         flex-direction: column;
         align-items: center;
@@ -652,15 +659,18 @@
       .transfer-instruction-text {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(3vw, 12px);
+        font-size: calc(var(--u) * 12);
         color: #333;
         text-align: center;
         margin-bottom: clamp(6px, 1.5vw, 10px);
+        margin-bottom: calc(var(--u) * 10);
         line-height: 1.4;
       }
 
       .transfer-instruction-hint {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2vw, 9px);
+        font-size: calc(var(--u) * 9);
         color: #555;
         text-align: center;
         line-height: 1.5;
@@ -671,31 +681,40 @@
       .transfer-text {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(3vw, 12px);
+        font-size: calc(var(--u) * 12);
         color: #333;
         text-align: center;
         margin-bottom: clamp(6px, 1.5vw, 10px);
+        margin-bottom: calc(var(--u) * 10);
         line-height: 1.4;
       }
 
       .transfer-hint {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2vw, 8px);
+        font-size: calc(var(--u) * 8);
         color: #555;
         text-align: center;
         line-height: 1.4;
         margin-bottom: clamp(8px, 2vw, 15px);
+        margin-bottom: calc(var(--u) * 15);
       }
 
       .transfer-select-btn {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2.5vw, 10px);
+        font-size: calc(var(--u) * 10);
         color: #d1cfba;
         background-color: #000;
         border: 2px solid #000;
+        border: calc(var(--u) * 2) solid #000;
         border-radius: 16px;
+        border-radius: calc(var(--u) * 16);
         padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2.5vw, 16px);
+        padding: calc(var(--u) * 8) calc(var(--u) * 16);
         cursor: pointer;
         margin-top: clamp(6px, 1.2vw, 10px);
+        margin-top: calc(var(--u) * 10);
       }
 
       .transfer-select-btn:hover {
@@ -723,27 +742,35 @@
       .transfer-options-title {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2.5vw, 12px);
+        font-size: calc(var(--u) * 12);
         color: #333;
         text-align: center;
         margin-bottom: clamp(8px, 2vw, 15px);
+        margin-bottom: calc(var(--u) * 15);
         line-height: 1.4;
       }
 
       .transfer-option-btn {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2.2vw, 12px);
+        font-size: calc(var(--u) * 12);
         color: #d1cfba;
         background-color: #000;
         border: 2px solid #000;
+        border: calc(var(--u) * 2) solid #000;
         border-radius: 16px;
+        border-radius: calc(var(--u) * 16);
         padding: clamp(6px, 1.5vw, 10px) clamp(12px, 2.5vw, 18px);
+        padding: calc(var(--u) * 10) calc(var(--u) * 18);
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        gap: calc(var(--u) * 8);
         margin-top: clamp(4px, 1vw, 8px);
+        margin-top: calc(var(--u) * 8);
         line-height: 1.4;
         transition:
           background-color 0.2s,
@@ -777,6 +804,7 @@
         background-color: transparent;
         color: #333;
         margin-top: clamp(8px, 1.5vw, 12px);
+        margin-top: calc(var(--u) * 12);
       }
 
       .transfer-option-secondary:hover {
@@ -785,10 +813,13 @@
 
       .transfer-option-badge {
         font-size: min(1.5vw, 7px);
+        font-size: calc(var(--u) * 7);
         background-color: #ffc500;
         color: #000;
         padding: 2px 6px;
+        padding: calc(var(--u) * 2) calc(var(--u) * 6);
         border-radius: 8px;
+        border-radius: calc(var(--u) * 8);
         text-transform: uppercase;
         display: inline-flex;
         align-items: center;
@@ -798,10 +829,13 @@
       .transfer-option-subtitle {
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2vw, 9px);
+        font-size: calc(var(--u) * 9);
         color: #555;
         text-align: center;
         margin-top: clamp(4px, 1vw, 6px);
+        margin-top: calc(var(--u) * 6);
         margin-bottom: clamp(4px, 1.2vw, 8px);
+        margin-bottom: calc(var(--u) * 8);
         line-height: 1.4;
       }
 
@@ -870,6 +904,7 @@
         transform: translateX(-50%);
         font-family: "Press Start 2P", "Courier New", monospace;
         font-size: min(2.53vw, 14px);
+        font-size: calc(var(--u) * 14);
         color: #333;
         text-align: center;
         line-height: 1;
