@@ -63,7 +63,8 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: calc(100dvh - clamp(40px, 10vh, 120px));
+        min-height: calc(100vh - clamp(40px, 10vh, 120px));
+        min-height: calc(100svh - clamp(40px, 10vh, 120px));
         line-height: 1.6;
         padding: clamp(20px, 5vh, 60px) clamp(10px, 3vw, 40px);
       }
@@ -78,8 +79,9 @@
       }
 
       .container {
-        text-align: center;
+        width: 100%;
         max-width: 800px;
+        text-align: center;
         min-height: 600px;
       }
 
