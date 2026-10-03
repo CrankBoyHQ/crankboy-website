@@ -1062,17 +1062,35 @@
       <div class="container">
         <div class="playdate-container">
           <picture>
-            <source srcset="playdate_new.webp" type="image/webp" />
-            <source srcset="playdate_new.png" type="image/png" />
+            <source
+              srcset="
+                playdate-550.webp 550w,
+                playdate-678.webp 678w,
+                playdate-825.webp 825w,
+                playdate.webp 1100w
+              "
+              sizes="(max-width: 590px) calc(100vw - 2 * clamp(10px, 3vw, 40px)), 550px"
+              type="image/webp"
+            />
+            <source
+              srcset="
+                playdate-550.png 550w,
+                playdate-678.png 678w,
+                playdate-825.png 825w,
+                playdate.png 1100w
+              "
+              sizes="(max-width: 590px) calc(100vw - 2 * clamp(10px, 3vw, 40px)), 550px"
+              type="image/png"
+            />
             <img
-              src="playdate_new.png"
+              src="playdate-550.png"
               alt="Playdate console with CrankBoy"
               class="playdate-image"
               decoding="async"
               fetchpriority="high"
               loading="eager"
-              width="2154"
-              height="2154"
+              width="1100"
+              height="1100"
             />
           </picture>
           <picture>
